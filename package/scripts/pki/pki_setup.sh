@@ -8,11 +8,20 @@
 
 # Capture location of the script to allow from invocation from any location 
 SCRIPT_DIR=$( dirname -- "$( readlink -f -- "$0"; )"; )
+
+# Setup instal log file
+dt=$(date '+%m-%d-%y')
+LOG_FILE=/var/log/hirs/hirs_aca_install_$dt.log
+
+log () {
+   echo $1
+   echo $1 >> $LOG_FILE
+}
+
 # Set HIRS PKI  password
 if [ -z $HIRS_PKI_PWD ]; then
-   # Create a 32 character random password
+   log "Creating a random password for key files"
    PKI_PASS=$(head -c 64 /dev/urandom | md5sum | tr -dc 'a-zA-Z0-9')
-   #PKI_PASS="xrb204k"
 fi
 
 # Create an ACA properties file using the new password
@@ -23,10 +32,10 @@ pushd $SCRIPT_DIR &> /dev/null
          else
             ACA_SETUP_DIR=="$SCRIPT_DIR/../aca"
       fi
-      echo "ACA_SETUP_DIR is $ACA_SETUP_DIR"
+      log "ACA_SETUP_DIR is $ACA_SETUP_DIR"
    sh $ACA_SETUP_DIR/aca_property_setup.sh $PKI_PASS
   else
-     echo  "aca property file exists, skipping"
+     log  "aca property file exists, skipping"
   fi
 
 popd &> /dev/null
@@ -39,7 +48,7 @@ if [ ! -d "/etc/hirs/certificates" ]; then
          else
             PKI_SETUP_DIR=="$SCRIPT_DIR/../pki"
       fi
-      echo "PKI_SETUP_DIR is $PKI_SETUP_DIR"
+      log "PKI_SETUP_DIR is $PKI_SETUP_DIR"
 
   mkdir -p /etc/hirs/certificates/
    
@@ -49,5 +58,5 @@ if [ ! -d "/etc/hirs/certificates" ]; then
   sh $PKI_SETUP_DIR/pki_chain_gen.sh "HIRS" "ecc" "512" "sha384" "$PKI_PASS" 
   popd &> /dev/null
 else 
-  echo "/etc/hirs/certificates exists, skipping"
+  log "/etc/hirs/certificates exists, skipping pki creation"
 fi

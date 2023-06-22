@@ -5,7 +5,12 @@ plugins {
     id "nebula.ospackage" version "9.1.1"
     id 'org.springframework.boot' version '3.0.6'
     id 'io.spring.dependency-management' version '1.1.0'
+    id 'com.bmuschko.tomcat' version '2.7.0'
 }
+
+apply plugin: 'java'
+apply plugin: 'war'
+
 
 // Get version from main project gradle
 def packVersion = properties.get("packageVersion");
@@ -16,6 +21,33 @@ java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(17)
     }
+}
+
+// Self executing jar with embedded tomcat for deployment
+jar {
+    manifest {
+       attributes 'Class-Path': '/libs/a.jar'
+       attributes "Main-Class": 'hirs.attestationca.portal.HIRSApplication'
+    }
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+
+}
+
+bootJar {
+    baseName = 'hirs-aca_'+"$jarVersion"
+    mainClassName = 'hirs.attestationca.portal.HIRSApplication'
+}
+
+
+// War file for deplyment to an existing tomcat server
+war {
+    from(buildDir) {
+        include 'VERSION'
+        into 'WEB-INF/classes'
+    }
+    archiveFileName = 'HIRS_AttestationCAPortal.war'
 }
 
 configurations {
@@ -30,6 +62,8 @@ repositories {
 }
 
 dependencies {
+
+    def tomcatVersion = '10.1.9'
     implementation project(':HIRS_Utils')
     implementation project(':HIRS_AttestationCA')
 
@@ -47,6 +81,10 @@ dependencies {
     implementation 'org.junit.jupiter:junit-jupiter:5.4.2'
     implementation 'org.junit.jupiter:junit-jupiter:5.4.2'
 
+    implementation 'org.apache.tomcat.embed:tomcat-embed-logging-juli:8.5.2'
+    implementation 'org.apache.tomcat.embed:tomcat-embed-core:10.1.9'
+    implementation 'org.apache.tomcat.embed:tomcat-embed-jasper:10.1.9'
+
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
     annotationProcessor 'org.projectlombok:lombok'
@@ -54,14 +92,6 @@ dependencies {
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation libs.testng
-}
-
-war {
-    from(buildDir) {
-        include 'VERSION'
-        into 'WEB-INF/classes'
-    }
-    archiveFileName = 'HIRS_AttestationCAPortal.war'
 }
 
 ospackage {
@@ -146,7 +176,7 @@ ospackage {
     postInstall 'rm -rf /tmp/aca/'
  //  postInstall file('../package/scripts/install_tomcat.sh')
      
-    postInstall 'sh /opt/tomcat/bin/catalina.sh start'
+ //   postInstall 'sh /opt/tomcat/bin/catalina.sh start'
 
     // Post Uninstall
     // Copy files to /tmp that package manager will be expecting them there

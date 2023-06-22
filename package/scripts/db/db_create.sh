@@ -10,14 +10,35 @@
 
 # Capture location of the script to allow from invocation from any location
 SCRIPT_DIR=$( dirname -- "$( readlink -f -- "$0"; )"; )
+
+# Set up ihris_aca_install log
+dt=$(date '+%m-%d-%y')
+LOG_FILE=/var/log/hirs/hirs_aca_install_$dt.log
+
+log () {
+   echo $1
+   echo $1 >> $LOG_FILE
+}
+log "HIRS ACA DB install start: $(date --date=@${DATE} '+%m-%d-%y:%H:%M')"
+
+# Check if mysql is installed
+type mysql >/dev/null 2>&1
+if [ $? -ne 0 ]; then
+   log "mariadb-server not installed, exiting HIRS ACA install"
+   exit 1;
+ else log "mariadb-server detected"
+fi
+
 # Set Mysql HIRS DB  password
 if [ -z $HIRS_DB_PWD ]; then
    HIRS_DB_PWD="hirs_db"
 fi
 # Save hirs_db mysql user password to the properties file
 mkdir -p /etc/hirs
-echo "hibernate.connection.username="hirs_db"" > /etc/hirs/hibernate.properties
-echo "hibernate.connection.password=$HIRS_DB_PWD" >> /etc/hirs/hibernate.properties
+mkdir -p /var/log/hirs
+
+log "hibernate.connection.username="hirs_db"" > /etc/hirs/hibernate.properties
+log "hibernate.connection.password=$HIRS_DB_PWD" >> /etc/hirs/hibernate.properties
 
 # Check if we're in a Docker container
 if [ -f /.dockerenv ]; then
@@ -31,46 +52,45 @@ if [[ $(pgrep -c -u mysql mysqld) -eq 0 ]]; then
 # Check if running in a container
    if [ $DOCKER_CONTAINER  = true ]; then
    # if in Docker container, avoid services that invoke the D-Bus
-       echo "ACA is running in a container..."
+       log "ACA is running in a container..."
        # Check if mariadb is setup
        if [ ! -d "/var/lib/mysql/mysql/" ]; then
-           echo "Installing mariadb"
+           log "Installing mariadb"
            /usr/bin/mysql_install_db
            chown -R mysql:mysql /var/lib/mysql/
        fi
-       echo "Starting mysql...."
+       log "Starting mysql...."
        chown -R mysql:mysql /var/log/mariadb
        /usr/bin/mysqld_safe &
    else
-       SQL_SERVICE="mariadb"
-       systemctl $SQL_SERVICE enable
-       systemctl $SQL_SERVICE start
+       systemctl enable mariadb
+       systemctl start mariadb
    fi
 fi
 
 # Wait for mysql to start before continuing.
-echo "Checking mysqld status..."
+log "Checking mysqld status..."
 while ! mysqladmin ping -h "$localhost" --silent; do
   sleep 1;
 done
 if [ -z ${HIRS_MYSQL_ROOT_PWD} ]; then
-    echo "HIRS_MYSQL_ROOT_PWD environment variable not set"
+    log "HIRS_MYSQL_ROOT_PWD environment variable not set"
     mysql -fu root  -e 'quit'  &> /dev/null;
 else
-   echo "Using $HIRS_MYSQL_ROOT_PWD as the mysql root password"
+   log "Using $HIRS_MYSQL_ROOT_PWD as the mysql root password"
    $(mysql -u root -p$HIRS_MYSQL_ROOT_PWD -e 'quit'  &> /dev/null);
 fi
 if [ $? -eq 0 ]; then
- echo "root password verified"
+ log "root password verified"
 else
- echo "MYSQL root password was not the default, not supplied,  or was incorrect"
- echo "      please set the HIRS_MYSQL_ROOT_PWD system variable and retry."
- echo "      ********** ACA Mysql setup aborted ********" ;
+ log "MYSQL root password was not the default, not supplied,  or was incorrect"
+ log "      please set the HIRS_MYSQL_ROOT_PWD system variable and retry."
+ log "      ********** ACA Mysql setup aborted ********" ;
  exit 1;
 fi
 
-echo "HIRS_DB_PWD is $HIRS_DB_PWD"
-echo "HIRS_MYSQL_ROOT_PWD is $HIRS_MYSQL_ROOT_PWD"
+log "HIRS_DB_PWD is $HIRS_DB_PWD"
+log "HIRS_MYSQL_ROOT_PWD is $HIRS_MYSQL_ROOT_PWD"
 
 if [ -d /opt/hirs/scripts/db ]; then
    MYSQL_DIR="/opt/hirs/scripts/db"
@@ -79,12 +99,12 @@ else
    MYSQL_DIR="$SCRIPT_DIR/../db"
 fi
 
-echo "MYSQL_DIR is $MYSQL_DIR"
+log "MYSQL_DIR is $MYSQL_DIR"
 
 # Check if hirs_db not created and create it if it wasn't
 mysqlshow --user=root --password="$HIRS_MYSQL_ROOT_PWD" | grep "hirs_db" > /dev/null 2>&1
 if [ $? -eq 0 ]; then
-   echo "hirs_db exists, skipping hirs_db create"
+   log "hirs_db exists, skipping hirs_db create"
 else
    mysql -u root --password=$HIRS_MYSQL_ROOT_PWD < $MYSQL_DIR/db_create.sql
    mysql -u root --password=$HIRS_MYSQL_ROOT_PWD < $MYSQL_DIR/secure_mysql.sql
