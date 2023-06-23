@@ -5,7 +5,6 @@ plugins {
     id "nebula.ospackage" version "9.1.1"
     id 'org.springframework.boot' version '3.0.6'
     id 'io.spring.dependency-management' version '1.1.0'
-    id 'com.bmuschko.tomcat' version '2.7.0'
 }
 
 apply plugin: 'java'
@@ -25,6 +24,8 @@ java {
 
 // Self executing jar with embedded tomcat for deployment
 jar {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
     manifest {
        attributes 'Class-Path': '/libs/a.jar'
        attributes "Main-Class": 'hirs.attestationca.portal.HIRSApplication'
@@ -75,20 +76,21 @@ dependencies {
 
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
+//    implementation 'org.springframework.boot:spring-boot-starter-tomcat' 
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.projectlombok:lombok'
     implementation 'commons-fileupload:commons-fileupload:1.5'
     implementation 'org.junit.jupiter:junit-jupiter:5.4.2'
     implementation 'org.junit.jupiter:junit-jupiter:5.4.2'
 
-    implementation 'org.apache.tomcat.embed:tomcat-embed-logging-juli:8.5.2'
-    implementation 'org.apache.tomcat.embed:tomcat-embed-core:10.1.9'
+//    implementation 'org.apache.tomcat.embed:tomcat-embed-logging-juli:8.5.2'
+//    implementation 'org.apache.tomcat.embed:tomcat-embed-core:10.1.9'
     implementation 'org.apache.tomcat.embed:tomcat-embed-jasper:10.1.9'
 
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
     annotationProcessor 'org.projectlombok:lombok'
-    providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
+//    providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation libs.testng
