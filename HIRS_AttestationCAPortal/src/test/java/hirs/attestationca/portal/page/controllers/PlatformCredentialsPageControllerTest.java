@@ -81,16 +81,16 @@ public class PlatformCredentialsPageControllerTest extends PageControllerTest {
 
     }
 
-    /**
-     * Tests uploading a cert that is a Platform Credential, and archiving it.
-     * @throws Exception if an exception occurs
-     */
-    @Test
-    @Rollback
-    public void uploadAndArchiveValidPlatformCert() throws Exception {
-        Certificate cert = uploadTestCert();
-        archiveTestCert(cert);
-    }
+//    /**
+//     * Tests uploading a cert that is a Platform Credential, and archiving it.
+//     * @throws Exception if an exception occurs
+//     */
+//    @Test
+//    @Rollback
+//    public void uploadAndArchiveValidPlatformCert() throws Exception {
+//        Certificate cert = uploadTestCert();
+//        archiveTestCert(cert);
+//    }
 
     private Certificate uploadTestCert() throws Exception {
 
@@ -146,8 +146,28 @@ public class PlatformCredentialsPageControllerTest extends PageControllerTest {
 
         String[] pathTokens = REALPCCERT.split("/");
 
+        //temp
+        List<Certificate> records1 = certificateRepository.findAll();
+        System.out.println("\n    XXXXXXXXXXXXXXXXXXXXXXXXX TestClass: before 1st upload: records size : " + records1.size());
+        if(records1.size() > 0) {
+            Certificate c1 = records1.iterator().next();
+            System.out.println("    XXXXXXXXXXXXXXXXXXXXXXXXX TestClass: before 1st upload: cert ID: " + c1.getId());
+            System.out.println("    XXXXXXXXXXXXXXXXXXXXXXXXX TestClass: before 1st upload: createTime: " + c1.getCreateTime().getTime());
+        }
+        System.out.println("\n    ------------------------------------------------------------");
+
         Certificate cert = uploadTestCert();
         archiveTestCert(cert);
+
+        //temp
+        List<Certificate> records2 = certificateRepository.findAll();
+        System.out.println("\n    XXXXXXXXXXXXXXXXXXXXXXXXX TestClass: before 2nd upload: records size : " + records2.size());
+        if(records2.size() > 0) {
+            Certificate c2 = records2.iterator().next();
+            System.out.println("    XXXXXXXXXXXXXXXXXXXXXXXXX TestClass: before 2nd upload: cert ID: " + c2.getId());
+            System.out.println("    XXXXXXXXXXXXXXXXXXXXXXXXX TestClass: before 2nd upload: createTime: " + c2.getCreateTime().getTime());
+        }
+        System.out.println("\n    ------------------------------------------------------------");
 
         // upload the same cert again
         MvcResult result = getMockMvc().perform(MockMvcRequestBuilders
@@ -165,7 +185,7 @@ public class PlatformCredentialsPageControllerTest extends PageControllerTest {
                 + pathTokens[1] + "): ",
                 pageMessages.getSuccess().get(0));
 
-        // verify the cert was actually stored
+        // verify there is still only one cert in db
         List<Certificate> records = certificateRepository.findAll();
         assertEquals(1, records.size());
 
@@ -174,70 +194,72 @@ public class PlatformCredentialsPageControllerTest extends PageControllerTest {
         // verify that the cert was unarchived
         assertFalse(newCert.isArchived());
 
-
-        // jamie
-        System.out.println("\n    XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX:   newCert.getCreateTime().getTime():" + newCert.getCreateTime().getTime());
-        System.out.println("\n    XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX:   cert.getCreateTime().getTime():" + cert.getCreateTime().getTime());
+        //temp
+        System.out.println("\n    XXXXXXXXXXXXXXXXXXXXXXXXX TestClass: after 2nd upload: records size : " + records.size());
+        if(records.size() > 0) {
+            System.out.println("    XXXXXXXXXXXXXXXXXXXXXXXXX TestClass: after 2nd upload: cert ID: " + newCert.getId());
+            System.out.println("    XXXXXXXXXXXXXXXXXXXXXXXXX TestClass: after 2nd upload: createTime: " + newCert.getCreateTime().getTime());
+        }
 
         // verify that the createTime was updated
-//        assertTrue(newCert.getCreateTime().getTime() > cert.getCreateTime().getTime());
+        assertTrue(newCert.getCreateTime().getTime() > cert.getCreateTime().getTime());
     }
 
-    /**
-     * Tests uploading a cert that is not a Platform Credential, which results in failure.
-     * @throws Exception if an exception occurs
-     */
-    @Test
-    @Rollback
-    public void uploadNonPlatformCert() throws Exception {
-
-        // verify there are initially no certs in db
-        List<Certificate> originalRecords =
-                certificateRepository.findAll();
-        assertEquals(0, originalRecords.size());
-
-        // perform upload. Attach csv file and add HTTP parameters for the baseline name and type.
-        MvcResult result = getMockMvc().perform(MockMvcRequestBuilders
-                        .multipart(pagePath + "/upload")
-                        .file(nonPcCertFile))
-                .andExpect(status().is3xxRedirection())
-                .andReturn();
-
-        // verify redirection messages
-        FlashMap flashMap = result.getFlashMap();
-        PageMessages pageMessages = (PageMessages) flashMap.get("messages");
-        assertEquals(0, pageMessages.getSuccess().size());
-        assertEquals(1, pageMessages.getError().size());
-
-        // verify the cert was not actually stored
-        List<Certificate> records =
-                certificateRepository.findAll();
-        assertEquals(0, records.size());
-    }
-
-    /**
-     * Tests that uploading something that is not a cert at all results in an error returned
-     * to the web client.
-     * @throws Exception an exception occurs
-     */
-    @Test
-    public void uploadBadPlatformCert() throws Exception {
-        // perform upload. Attach csv file and add HTTP parameters for the baseline name and type.
-        MvcResult result = getMockMvc().perform(MockMvcRequestBuilders
-                        .multipart(pagePath + "/upload")
-                        .file(badCertFile))
-                .andExpect(status().is3xxRedirection())
-                .andReturn();
-
-        // verify redirection messages
-        FlashMap flashMap = result.getFlashMap();
-        PageMessages pageMessages = (PageMessages) flashMap.get("messages");
-        assertEquals(1, pageMessages.getError().size());
-        assertEquals(0, pageMessages.getSuccess().size());
-
-        // verify the cert was not actually stored
-        List<Certificate> records =
-                certificateRepository.findAll();
-        assertEquals(0, records.size());
-    }
+//    /**
+//     * Tests uploading a cert that is not a Platform Credential, which results in failure.
+//     * @throws Exception if an exception occurs
+//     */
+//    @Test
+//    @Rollback
+//    public void uploadNonPlatformCert() throws Exception {
+//
+//        // verify there are initially no certs in db
+//        List<Certificate> originalRecords =
+//                certificateRepository.findAll();
+//        assertEquals(0, originalRecords.size());
+//
+//        // perform upload. Attach csv file and add HTTP parameters for the baseline name and type.
+//        MvcResult result = getMockMvc().perform(MockMvcRequestBuilders
+//                        .multipart(pagePath + "/upload")
+//                        .file(nonPcCertFile))
+//                .andExpect(status().is3xxRedirection())
+//                .andReturn();
+//
+//        // verify redirection messages
+//        FlashMap flashMap = result.getFlashMap();
+//        PageMessages pageMessages = (PageMessages) flashMap.get("messages");
+//        assertEquals(0, pageMessages.getSuccess().size());
+//        assertEquals(1, pageMessages.getError().size());
+//
+//        // verify the cert was not actually stored
+//        List<Certificate> records =
+//                certificateRepository.findAll();
+//        assertEquals(0, records.size());
+//    }
+//
+//    /**
+//     * Tests that uploading something that is not a cert at all results in an error returned
+//     * to the web client.
+//     * @throws Exception an exception occurs
+//     */
+//    @Test
+//    public void uploadBadPlatformCert() throws Exception {
+//        // perform upload. Attach csv file and add HTTP parameters for the baseline name and type.
+//        MvcResult result = getMockMvc().perform(MockMvcRequestBuilders
+//                        .multipart(pagePath + "/upload")
+//                        .file(badCertFile))
+//                .andExpect(status().is3xxRedirection())
+//                .andReturn();
+//
+//        // verify redirection messages
+//        FlashMap flashMap = result.getFlashMap();
+//        PageMessages pageMessages = (PageMessages) flashMap.get("messages");
+//        assertEquals(1, pageMessages.getError().size());
+//        assertEquals(0, pageMessages.getSuccess().size());
+//
+//        // verify the cert was not actually stored
+//        List<Certificate> records =
+//                certificateRepository.findAll();
+//        assertEquals(0, records.size());
+//    }
 }

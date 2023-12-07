@@ -347,6 +347,15 @@ public class CertificatePageController extends PageController<NoPageParams> {
             }
         }
 
+
+        // jamie
+        List<Certificate> records2 = certificateRepository.findAll();
+        Certificate c2 = records2.iterator().next();
+        System.out.println("\n    XXXXXXXXXXXXXXXXXXXXXXXXX CertPageCtl: after upload/store: records size: " + records2.size());
+        System.out.println("    XXXXXXXXXXXXXXXXXXXXXXXXX CertPageCtl: after upload/store: ID:" + c2.getId());
+        System.out.println("    XXXXXXXXXXXXXXXXXXXXXXXXX CertPageCtl: after upload/store: createTime:" + c2.getCreateTime().getTime());
+
+
         //Add messages to the model
         model.put(MESSAGES_ATTRIBUTE, messages);
 
@@ -860,6 +869,7 @@ public class CertificatePageController extends PageController<NoPageParams> {
             existingCertificate = getCertificateByHash(
                     certificateType,
                     certificate.getCertificateHash());
+
         } catch (DBServiceException dbsEx) {
             final String failMessage = "Querying for existing certificate failed ("
                     + fileName + "): ";
@@ -931,6 +941,7 @@ public class CertificatePageController extends PageController<NoPageParams> {
         try {
             // if an identical certificate is archived, update the existing certificate to
             // unarchive it and change the creation date
+
             if (existingCertificate.isArchived()) {
                 existingCertificate.restore();
                 existingCertificate.resetCreateTime();
@@ -940,6 +951,7 @@ public class CertificatePageController extends PageController<NoPageParams> {
                         + "found and unarchived (%s): ", fileName);
                 messages.addSuccess(successMsg);
                 log.info(successMsg);
+
                 return;
             }
         } catch (DBServiceException dbsEx) {
