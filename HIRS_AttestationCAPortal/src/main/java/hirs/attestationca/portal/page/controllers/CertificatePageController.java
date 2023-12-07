@@ -335,26 +335,31 @@ public class CertificatePageController extends PageController<NoPageParams> {
         PageMessages messages = new PageMessages();
 
         for (MultipartFile file : files) {
+
             //Parse certificate
             Certificate certificate = parseCertificate(certificateType, file, messages);
 
             //Store only if it was parsed
             if (certificate != null) {
+
+
+                //jamie
+                System.out.println("\n    XXXXXXXXXXXXXXXXXXXXXXXXX CertPageCtl: in upload, cert is NOT null");
+
+
                 storeCertificate(
                         certificateType,
                         file.getOriginalFilename(),
                         messages, certificate);
             }
+
+
+            //jamie
+            else {
+                System.out.println("\n    XXXXXXXXXXXXXXXXXXXXXXXXX CertPageCtl: in upload, cert is null");
+
+            }
         }
-
-
-        // jamie
-        List<Certificate> records2 = certificateRepository.findAll();
-        Certificate c2 = records2.iterator().next();
-        System.out.println("\n    XXXXXXXXXXXXXXXXXXXXXXXXX CertPageCtl: after upload/store: records size: " + records2.size());
-        System.out.println("    XXXXXXXXXXXXXXXXXXXXXXXXX CertPageCtl: after upload/store: ID:" + c2.getId());
-        System.out.println("    XXXXXXXXXXXXXXXXXXXXXXXXX CertPageCtl: after upload/store: createTime:" + c2.getCreateTime().getTime());
-
 
         //Add messages to the model
         model.put(MESSAGES_ATTRIBUTE, messages);
