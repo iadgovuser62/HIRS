@@ -3,6 +3,8 @@ package hirs.attestationca.portal.page.controllers;
 import hirs.attestationca.persist.entity.Appraiser;
 import hirs.attestationca.persist.entity.manager.PolicyRepository;
 import hirs.attestationca.persist.entity.userdefined.PolicySettings;
+import hirs.attestationca.persist.entity.userdefined.certificate.CertificateAuthorityCredential;
+import hirs.attestationca.persist.entity.userdefined.certificate.EndorsementCredential;
 import hirs.attestationca.portal.page.PageController;
 import hirs.attestationca.portal.page.PageControllerTest;
 import org.junit.jupiter.api.BeforeAll;
@@ -12,6 +14,8 @@ import static hirs.attestationca.portal.page.Page.POLICY;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+
+import java.util.List;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -65,11 +69,36 @@ public class PolicyPageControllerTest extends PageControllerTest {
 //        policy = (SupplyChainPolicy) policyManager.getDefaultPolicy(
 //                supplyChainAppraiser);
 
+        //jamie prints
+        List<PolicySettings> records1 =
+                policyRepository.findAll();
+        System.out.println("setup function: num records before creating any: " + records1.size());        //jamie prints
+        int cnt = 0;
+        for (PolicySettings eachpolicy1 : records1) {
+            cnt ++;
+            System.out.println("setup function: policy #" + cnt + " id: " + eachpolicy1.getId());
+            System.out.println("setup function: policy #" + cnt + " name: " + eachpolicy1.getName());
+        }
+
         // create the supply chain policy
         policy = new PolicySettings("DEFAULT SCP", "a default policy");
         policyRepository.save(policy);
 
+        //jamie prints
+        List<PolicySettings> records2 =
+                policyRepository.findAll();
+        System.out.println("setup function: num records after creating 1: " + records2.size());
+
         policy = policyRepository.findByName("DEFAULT SCP");
+
+        //jamie prints
+        cnt = 0;
+        for (PolicySettings eachpolicy2 : records2) {
+            cnt ++;
+            System.out.println("setup function: policy #" + cnt + " id: " + eachpolicy2.getId());
+            System.out.println("setup function: policy #" + cnt + " name: " + eachpolicy2.getName());
+        }
+
 
     }
 
@@ -133,8 +162,26 @@ public class PolicyPageControllerTest extends PageControllerTest {
                         hasProperty("success",
                                 hasItem("Endorsement credential validation enabled"))));
 
+
+
+        //jamie prints
+        List<PolicySettings> records =
+                policyRepository.findAll();
+        System.out.println("num records: " + records.size());
+
         policy = policyRepository.findByName("DEFAULT SCP");
-//        assertTrue(policy.isEcValidationEnabled());
+//        policy = policyRepository.findByName("Default");
+        if(policy == null) {
+
+            System.out.println("policy is null");
+        }
+        else {
+
+            System.out.println("policy is NOT null");
+            System.out.println("policy id: " + policy.getId());
+            System.out.println("policy name: " + policy.getName());
+        }
+        assertTrue(policy.isEcValidationEnabled());
     }
 
 //    /**
