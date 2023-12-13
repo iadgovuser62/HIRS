@@ -69,35 +69,50 @@ public class PolicyPageControllerTest extends PageControllerTest {
 //        policy = (SupplyChainPolicy) policyManager.getDefaultPolicy(
 //                supplyChainAppraiser);
 
-        //jamie prints
-        List<PolicySettings> records1 =
-                policyRepository.findAll();
-        System.out.println("setup function: num records before creating any: " + records1.size());        //jamie prints
-        int cnt = 0;
-        for (PolicySettings eachpolicy1 : records1) {
-            cnt ++;
-            System.out.println("setup function: policy #" + cnt + " id: " + eachpolicy1.getId());
-            System.out.println("setup function: policy #" + cnt + " name: " + eachpolicy1.getName());
-        }
 
         // create the supply chain policy
-        policy = new PolicySettings("DEFAULT SCP", "a default policy");
-        policyRepository.save(policy);
+        policy = policyRepository.findByName("Default");
 
-        //jamie prints
-        List<PolicySettings> records2 =
-                policyRepository.findAll();
-        System.out.println("setup function: num records after creating 1: " + records2.size());
+        if(policy == null) {
 
-        policy = policyRepository.findByName("DEFAULT SCP");
-
-        //jamie prints
-        cnt = 0;
-        for (PolicySettings eachpolicy2 : records2) {
-            cnt ++;
-            System.out.println("setup function: policy #" + cnt + " id: " + eachpolicy2.getId());
-            System.out.println("setup function: policy #" + cnt + " name: " + eachpolicy2.getName());
+            System.out.println("beforeall: policy is null");
         }
+        else {
+
+            System.out.println("beforeall: policy is NOT null");
+            System.out.println("beforeall: policy id: " + policy.getId());
+            System.out.println("beforeall: policy name: " + policy.getName());
+        }
+
+//        //jamie prints
+//        List<PolicySettings> records1 =
+//                policyRepository.findAll();
+//        System.out.println("setup function: num records before creating any: " + records1.size());        //jamie prints
+//        int cnt = 0;
+//        for (PolicySettings eachpolicy1 : records1) {
+//            cnt ++;
+//            System.out.println("setup function: policy #" + cnt + " id: " + eachpolicy1.getId());
+//            System.out.println("setup function: policy #" + cnt + " name: " + eachpolicy1.getName());
+//        }
+//
+//        // create the supply chain policy
+//        policy = new PolicySettings("DEFAULT SCP", "a default policy");
+//        policyRepository.save(policy);
+//
+//        //jamie prints
+//        List<PolicySettings> records2 =
+//                policyRepository.findAll();
+//        System.out.println("setup function: num records after creating 1: " + records2.size());
+//
+//        policy = policyRepository.findByName("DEFAULT SCP");
+//
+//        //jamie prints
+//        cnt = 0;
+//        for (PolicySettings eachpolicy2 : records2) {
+//            cnt ++;
+//            System.out.println("setup function: policy #" + cnt + " id: " + eachpolicy2.getId());
+//            System.out.println("setup function: policy #" + cnt + " name: " + eachpolicy2.getName());
+//        }
 
 
     }
@@ -169,8 +184,8 @@ public class PolicyPageControllerTest extends PageControllerTest {
                 policyRepository.findAll();
         System.out.println("num records: " + records.size());
 
-        policy = policyRepository.findByName("DEFAULT SCP");
-//        policy = policyRepository.findByName("Default");
+//        policy = policyRepository.findByName("DEFAULT SCP");
+        policy = policyRepository.findByName("Default");
         if(policy == null) {
 
             System.out.println("policy is null");
