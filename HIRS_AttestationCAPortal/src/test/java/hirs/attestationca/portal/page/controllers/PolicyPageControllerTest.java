@@ -52,69 +52,8 @@ public class PolicyPageControllerTest extends PageControllerTest {
     @BeforeAll
     public void setUpPolicy() {
 
-//        // create default group so that the policy can be applied as a default.
-//        if (groupManager.getDeviceGroup(DeviceGroup.DEFAULT_GROUP) == null) {
-//            groupManager.saveDeviceGroup(new DeviceGroup(DeviceGroup.DEFAULT_GROUP));
-//        }
-//
-//        appraiserManager.saveAppraiser(new SupplyChainAppraiser());
-//        final Appraiser supplyChainAppraiser = appraiserManager.getAppraiser(
-//                SupplyChainAppraiser.NAME);
-//
-//        policy = new SupplyChainPolicy("DEFAULT SCP", "a default policy");
-//        policyManager.savePolicy(policy);
-//        policyManager.setDefaultPolicy(supplyChainAppraiser, policy);
-//
-//
-//        policy = (SupplyChainPolicy) policyManager.getDefaultPolicy(
-//                supplyChainAppraiser);
-
-
         // create the supply chain policy
         policy = policyRepository.findByName("Default");
-
-        if(policy == null) {
-
-            System.out.println("beforeall: policy is null");
-        }
-        else {
-
-            System.out.println("beforeall: policy is NOT null");
-            System.out.println("beforeall: policy id: " + policy.getId());
-            System.out.println("beforeall: policy name: " + policy.getName());
-        }
-
-//        //jamie prints
-//        List<PolicySettings> records1 =
-//                policyRepository.findAll();
-//        System.out.println("setup function: num records before creating any: " + records1.size());        //jamie prints
-//        int cnt = 0;
-//        for (PolicySettings eachpolicy1 : records1) {
-//            cnt ++;
-//            System.out.println("setup function: policy #" + cnt + " id: " + eachpolicy1.getId());
-//            System.out.println("setup function: policy #" + cnt + " name: " + eachpolicy1.getName());
-//        }
-//
-//        // create the supply chain policy
-//        policy = new PolicySettings("DEFAULT SCP", "a default policy");
-//        policyRepository.save(policy);
-//
-//        //jamie prints
-//        List<PolicySettings> records2 =
-//                policyRepository.findAll();
-//        System.out.println("setup function: num records after creating 1: " + records2.size());
-//
-//        policy = policyRepository.findByName("DEFAULT SCP");
-//
-//        //jamie prints
-//        cnt = 0;
-//        for (PolicySettings eachpolicy2 : records2) {
-//            cnt ++;
-//            System.out.println("setup function: policy #" + cnt + " id: " + eachpolicy2.getId());
-//            System.out.println("setup function: policy #" + cnt + " name: " + eachpolicy2.getName());
-//        }
-
-
     }
 
     /**
@@ -177,51 +116,32 @@ public class PolicyPageControllerTest extends PageControllerTest {
                         hasProperty("success",
                                 hasItem("Endorsement credential validation enabled"))));
 
-
-
-        //jamie prints
-        List<PolicySettings> records =
-                policyRepository.findAll();
-        System.out.println("num records: " + records.size());
-
-//        policy = policyRepository.findByName("DEFAULT SCP");
         policy = policyRepository.findByName("Default");
-        if(policy == null) {
-
-            System.out.println("policy is null");
-        }
-        else {
-
-            System.out.println("policy is NOT null");
-            System.out.println("policy id: " + policy.getId());
-            System.out.println("policy name: " + policy.getName());
-        }
         assertTrue(policy.isEcValidationEnabled());
     }
 
-//    /**
-//     * Verifies the rest call for disabling the EC Validation policy setting.
-//     *
-//     * @throws Exception if test fails
-//     */
-//    @Test
-//    public void testUpdateEcValDisable() throws Exception {
-//
-//        final String baseURL = "/" + POLICY.getViewName();
-//        ResultActions actions;
-//
-//        //init the database
-//        policy = getDefaultPolicy();
-//        policy.setPcValidationEnabled(false);
-//        policy.setEcValidationEnabled(true);
-//        policy.setFirmwareValidationEnabled(false);
-//        policyManager.updatePolicy(policy);
-//
-//        // perform the mock request
-//        actions = getMockMvc()
-//                .perform(MockMvcRequestBuilders.post(baseURL + "/update-ec-validation")
-//                        .param("ecValidate", "unchecked"));
-//
+    /**
+     * Verifies the rest call for disabling the EC Validation policy setting.
+     *
+     * @throws Exception if test fails
+     */
+    @Test
+    public void testUpdateEcValDisable() throws Exception {
+
+        ResultActions actions;
+
+        //init the database
+        policy = policyRepository.findByName("Default");
+        policy.setPcValidationEnabled(false);
+        policy.setEcValidationEnabled(true);
+        policy.setFirmwareValidationEnabled(false);
+        policyRepository.save(policy);
+
+        // perform the mock request
+        actions = getMockMvc()
+                .perform(MockMvcRequestBuilders.post(pagePath + "/update-ec-validation")
+                        .param("ecValidate", "unchecked"));
+
 //        actions
 //                // check HTTP status
 //                .andExpect(status().is3xxRedirection())
@@ -229,7 +149,7 @@ public class PolicyPageControllerTest extends PageControllerTest {
 //                .andExpect(flash().attribute(PageController.MESSAGES_ATTRIBUTE,
 //                        hasProperty("success",
 //                                hasItem("Endorsement credential validation disabled"))));
-//
+
 //        policy = getDefaultPolicy();
 //        Assert.assertFalse(policy.isEcValidationEnabled());
 //
@@ -256,7 +176,7 @@ public class PolicyPageControllerTest extends PageControllerTest {
 //        policy = getDefaultPolicy();
 //        Assert.assertTrue(policy.isEcValidationEnabled());
 //
-//    }
+    }
 //
 //    /**
 //     * Verifies the rest call for enabling the PC Validation policy setting.
