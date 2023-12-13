@@ -3,7 +3,10 @@ package hirs.attestationca.portal.page.controllers;
 import hirs.appraiser.Appraiser;
 import hirs.appraiser.SupplyChainAppraiser;
 import hirs.data.persist.DeviceGroup;
+import hirs.data.persist.Policy;
 import hirs.data.persist.SupplyChainPolicy;
+import hirs.data.persist.certificate.Certificate;
+import hirs.data.persist.certificate.EndorsementCredential;
 import hirs.persist.AppraiserManager;
 import hirs.persist.DeviceGroupManager;
 import hirs.persist.PolicyManager;
@@ -24,6 +27,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import hirs.attestationca.portal.page.PageController;
+
+import java.util.List;
+import java.util.Set;
 
 /**
  * Integration tests that test the URL End Points of PolicyPageController.
@@ -64,9 +70,27 @@ public class PolicyPageControllerTest extends PageControllerTest {
         final Appraiser supplyChainAppraiser = appraiserManager.getAppraiser(
                 SupplyChainAppraiser.NAME);
 
+
+        // jamie print
+        List<Policy> records = policyManager.getPolicyList(Policy.class);
+        System.out.println("setup function: num records before creating any: " + records.size());
+
         policy = new SupplyChainPolicy("DEFAULT SCP", "a default policy");
         policyManager.savePolicy(policy);
+
+
+        // jamie print
+        List<Policy> records2 = policyManager.getPolicyList(Policy.class);
+        System.out.println("setup function: num records after creating 1: " + records2.size());
+
+
         policyManager.setDefaultPolicy(supplyChainAppraiser, policy);
+
+
+        // jamie print
+        List<Policy> records3 = policyManager.getPolicyList(Policy.class);
+        System.out.println("setup function: num records after setting default policy: " + records3.size());
+
 
         policy = (SupplyChainPolicy) policyManager.getDefaultPolicy(
                 supplyChainAppraiser);
@@ -132,7 +156,17 @@ public class PolicyPageControllerTest extends PageControllerTest {
                     hasProperty("success",
                         hasItem("Endorsement credential validation enabled"))));
 
+        // jamie print
+        List<Policy> records4 = policyManager.getPolicyList(Policy.class);
+        System.out.println("test function: num records after /update-ec-validation: " + records4.size());
+
         policy = getDefaultPolicy();
+
+        // jamie print
+        List<Policy> records5 = policyManager.getPolicyList(Policy.class);
+        System.out.println("test function: num records after getDefaultPolicy: " + records5.size());
+
+
         Assert.assertTrue(policy.isEcValidationEnabled());
     }
 
