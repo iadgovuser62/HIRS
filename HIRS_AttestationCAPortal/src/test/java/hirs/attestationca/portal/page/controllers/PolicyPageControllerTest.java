@@ -15,6 +15,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
@@ -68,7 +69,7 @@ public class PolicyPageControllerTest extends PageControllerTest {
         policy = new PolicySettings("DEFAULT SCP", "a default policy");
         policyRepository.save(policy);
 
-        policy = (PolicySettings) policyRepository.findByName("DEFAULT SCP");
+        policy = policyRepository.findByName("DEFAULT SCP");
 
     }
 
@@ -109,34 +110,33 @@ public class PolicyPageControllerTest extends PageControllerTest {
                         hasProperty("enableFirmwareValidation", is(fm))));
     }
 
-//    /**
-//     * Verifies the rest call for enabling the EC Validation policy setting.
-//     *
-//     * @throws Exception if test fails
-//     */
-//    @Test
-//    public void testUpdateEcValEnable() throws Exception {
-//
-//        final String baseURL = "/" + POLICY.getViewName();
-//        ResultActions actions;
-//
-//        // perform the mock request
-//        actions = getMockMvc()
-//                .perform(MockMvcRequestBuilders.post(baseURL + "/update-ec-validation")
-//                        .param("ecValidate", "checked"));
-//
-//        actions
-//                // check HTTP status
-//                .andExpect(status().is3xxRedirection())
-//                // check the messages forwarded to the redirected page
-//                .andExpect(flash().attribute(PageController.MESSAGES_ATTRIBUTE,
-//                        hasProperty("success",
-//                                hasItem("Endorsement credential validation enabled"))));
-//
-//        policy = getDefaultPolicy();
-//        Assert.assertTrue(policy.isEcValidationEnabled());
-//    }
-//
+    /**
+     * Verifies the rest call for enabling the EC Validation policy setting.
+     *
+     * @throws Exception if test fails
+     */
+    @Test
+    public void testUpdateEcValEnable() throws Exception {
+
+        ResultActions actions;
+
+        // perform the mock request
+        actions = getMockMvc()
+                .perform(MockMvcRequestBuilders.post(pagePath + "/update-ec-validation")
+                        .param("ecValidate", "checked"));
+
+        actions
+                // check HTTP status
+                .andExpect(status().is3xxRedirection())
+                // check the messages forwarded to the redirected page
+                .andExpect(flash().attribute(PageController.MESSAGES_ATTRIBUTE,
+                        hasProperty("success",
+                                hasItem("Endorsement credential validation enabled"))));
+
+        policy = policyRepository.findByName("DEFAULT SCP");
+//        assertTrue(policy.isEcValidationEnabled());
+    }
+
 //    /**
 //     * Verifies the rest call for disabling the EC Validation policy setting.
 //     *
