@@ -89,18 +89,18 @@ public class PolicyPageControllerTest extends PageControllerTest {
         System.out.println("    XXXX testInitPage, pc: " + pc);
         System.out.println("    XXXX testInitPage, fm: " + fm);
 
-//        // perform test
-//        getMockMvc()
-//                .perform(MockMvcRequestBuilders.get(pagePath))
-//                .andExpect(status().isOk())
-//                // Test that the two boolean policy values sent to the page match
-//                // the actual policy values.
-//                .andExpect(model().attribute(PolicyPageController.INITIAL_DATA,
-//                        hasProperty("enableEcValidation", is(ec))))
-//                .andExpect(model().attribute(PolicyPageController.INITIAL_DATA,
-//                        hasProperty("enablePcCertificateValidation", is(pc))))
-//                .andExpect(model().attribute(PolicyPageController.INITIAL_DATA,
-//                        hasProperty("enableFirmwareValidation", is(fm))));
+        // perform test
+        getMockMvc()
+                .perform(MockMvcRequestBuilders.get(pagePath))
+                .andExpect(status().isOk())
+                // Test that the two boolean policy values sent to the page match
+                // the actual policy values.
+                .andExpect(model().attribute(PolicyPageController.INITIAL_DATA,
+                        hasProperty("enableEcValidation", is(ec))))
+                .andExpect(model().attribute(PolicyPageController.INITIAL_DATA,
+                        hasProperty("enablePcCertificateValidation", is(pc))))
+                .andExpect(model().attribute(PolicyPageController.INITIAL_DATA,
+                        hasProperty("enableFirmwareValidation", is(fm))));
     }
 
     /**
@@ -351,91 +351,93 @@ public class PolicyPageControllerTest extends PageControllerTest {
 
     }
 
-//    /**
-//     * Verifies the rest call for enabling the PC attribute Validation policy setting.
-//     *
-//     * @throws Exception if test fails
-//     */
-//    @Test
-//    public void testUpdatePcAttributeValEnable() throws Exception {
-//
-//        final String baseURL = "/" + POLICY.getViewName();
-//        ResultActions actions;
-//
-//        //init the database
-//        policy = getDefaultPolicy();
-//        policy.setPcAttributeValidationEnabled(false);
-//        policy.setPcValidationEnabled(true);
-//        policy.setFirmwareValidationEnabled(false);
-//        policyManager.updatePolicy(policy);
-//
-//        // perform the mock request
-//        actions = getMockMvc()
-//                .perform(MockMvcRequestBuilders.post(baseURL + "/update-pc-attribute-validation")
-//                        .param("pcAttributeValidate", "checked"));
-//
-//        actions
-//                // check HTTP status
-//                .andExpect(status().is3xxRedirection())
-//                // check the messages forwarded to the redirected page
-//                .andExpect(flash().attribute(PageController.MESSAGES_ATTRIBUTE,
-//                        hasProperty("success",
-//                                hasItem("Platform certificate attribute validation enabled"))));
-//
-//        policy = getDefaultPolicy();
-//        Assert.assertTrue(policy.isPcAttributeValidationEnabled());
-//
-//        //reset database for invalid policy test
-//        policy.setPcAttributeValidationEnabled(false);
-//        policy.setPcValidationEnabled(false);
-//        policyManager.updatePolicy(policy);
-//
-//        // perform the mock request
-//        actions = getMockMvc()
-//                .perform(MockMvcRequestBuilders.post(baseURL + "/update-pc-attribute-validation")
-//                        .param("pcAttributeValidate", "checked"));
-//
-//        actions
-//                // check HTTP status
-//                .andExpect(status().is3xxRedirection())
-//                // check the messages forwarded to the redirected page
-//                .andExpect(flash().attribute(PageController.MESSAGES_ATTRIBUTE,
-//                        hasProperty("error",
-//                                hasItem("To enable Platform Attribute Validation,"
-//                                        + " Platform Credential Validation must also be enabled."))));
-//
-//        policy = getDefaultPolicy();
-//        Assert.assertFalse(policy.isPcAttributeValidationEnabled());
-//
-//    }
-//
-//    /**
-//     * Verifies the rest call for disabling the PC attribute validation policy setting.
-//     * @throws Exception if test fails
-//     */
-//    @Test
-//    public void testUpdatePcAttributeValDisable() throws Exception {
-//
-//        final String baseURL = "/" + POLICY.getViewName();
-//        ResultActions actions;
-//
-//        // perform the mock request
-//        actions = getMockMvc()
-//                .perform(MockMvcRequestBuilders.post(baseURL + "/update-pc-attribute-validation")
-//                        .param("pcAttributeValidate", "unchecked"));
-//
-//        actions
-//                // check HTTP status
-//                .andExpect(status().is3xxRedirection())
-//                // check the messages forwarded to the redirected page
-//                .andExpect(flash().attribute(PageController.MESSAGES_ATTRIBUTE,
-//                        hasProperty("success",
-//                                hasItem("Platform certificate attribute validation disabled"))));
-//
-//        policy = getDefaultPolicy();
-//        Assert.assertFalse(policy.isPcAttributeValidationEnabled());
-//    }
-//
+    /**
+     * Verifies the rest call for enabling the PC attribute Validation policy setting.
+     *
+     * @throws Exception if test fails
+     */
+    @Test
+    public void testUpdatePcAttributeValEnable() throws Exception {
+
+        System.out.println("XXXX testUpdatePcAttributeValEnable");
+
+        ResultActions actions;
+
+        //init the database
+        policy = policyRepository.findByName("Default");
+        policy.setPcAttributeValidationEnabled(false);
+        policy.setPcValidationEnabled(true);
+        policy.setFirmwareValidationEnabled(false);
+        policyRepository.save(policy);
+
+        // perform the mock request
+        actions = getMockMvc()
+                .perform(MockMvcRequestBuilders.post(pagePath + "/update-pc-attribute-validation")
+                        .param("pcAttributeValidate", "checked"));
+
+        actions
+                // check HTTP status
+                .andExpect(status().is3xxRedirection())
+                // check the messages forwarded to the redirected page
+                .andExpect(flash().attribute(PageController.MESSAGES_ATTRIBUTE,
+                        hasProperty("success",
+                                hasItem("Platform certificate attribute validation enabled"))));
+
+        policy = policyRepository.findByName("Default");
+        assertTrue(policy.isPcAttributeValidationEnabled());
+
+        //reset database for invalid policy test
+        policy.setPcAttributeValidationEnabled(false);
+        policy.setPcValidationEnabled(false);
+        policyRepository.save(policy);
+
+        // perform the mock request
+        actions = getMockMvc()
+                .perform(MockMvcRequestBuilders.post(pagePath + "/update-pc-attribute-validation")
+                        .param("pcAttributeValidate", "checked"));
+
+        actions
+                // check HTTP status
+                .andExpect(status().is3xxRedirection())
+                // check the messages forwarded to the redirected page
+                .andExpect(flash().attribute(PageController.MESSAGES_ATTRIBUTE,
+                        hasProperty("error",
+                                hasItem("To enable Platform Attribute Validation,"
+                                        + " Platform Credential Validation must also be enabled."))));
+
+        policy = policyRepository.findByName("Default");
+        assertFalse(policy.isPcAttributeValidationEnabled());
+
+    }
+
+    /**
+     * Verifies the rest call for disabling the PC attribute validation policy setting.
+     * @throws Exception if test fails
+     */
+    @Test
+    public void testUpdatePcAttributeValDisable() throws Exception {
+
+        System.out.println("XXXX testUpdatePcAttributeValDisable");
+
+        ResultActions actions;
+
+        // perform the mock request
+        actions = getMockMvc()
+                .perform(MockMvcRequestBuilders.post(pagePath + "/update-pc-attribute-validation")
+                        .param("pcAttributeValidate", "unchecked"));
+
+        actions
+                // check HTTP status
+                .andExpect(status().is3xxRedirection())
+                // check the messages forwarded to the redirected page
+                .andExpect(flash().attribute(PageController.MESSAGES_ATTRIBUTE,
+                        hasProperty("success",
+                                hasItem("Platform certificate attribute validation disabled"))));
+
+        policy = policyRepository.findByName("Default");
+        assertFalse(policy.isPcAttributeValidationEnabled());
+    }
+
 //    /**
 //     * Helper function to get a fresh load of the default policy from the DB.
 //     *
