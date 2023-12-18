@@ -54,7 +54,7 @@ public class PolicyPageControllerTest extends PageControllerTest {
         // create the supply chain policy
         policy = policyRepository.findByName("Default");
     }
-
+    
     /**
      * Verifies that spring is initialized properly by checking that an autowired bean
      * is populated.
@@ -62,7 +62,7 @@ public class PolicyPageControllerTest extends PageControllerTest {
     @Test
     public void verifySpringInitialized() {
 
-        System.out.println("XXXX verifySpringInitialized");
+        System.out.println("XXXX 1 verifySpringInitialized");
 
         assertNotNull(policyRepository);
         assertNotNull(policy);
@@ -76,7 +76,7 @@ public class PolicyPageControllerTest extends PageControllerTest {
     @Test
     public void testInitPage() throws Exception {
 
-        System.out.println("XXXX testInitPage");
+        System.out.println("XXXX 2 testInitPage");
 
         boolean ec = policy.isEcValidationEnabled();
         boolean pc = policy.isPcValidationEnabled();
@@ -111,14 +111,14 @@ public class PolicyPageControllerTest extends PageControllerTest {
     @Test
     public void testUpdateEcValEnable() throws Exception {
 
-        System.out.println("XXXX testUpdateEcValEnable");
+        System.out.println("XXXX 3 testUpdateEcValEnable");
 
         ResultActions actions;
 
         //init the database (should all initially be false, but set them just in case the tests run out of order)
         policy = policyRepository.findByName("Default");
-        policy.setPcValidationEnabled(false);
         policy.setEcValidationEnabled(false);
+        policy.setPcValidationEnabled(false);
         policy.setFirmwareValidationEnabled(false);
         policyRepository.save(policy);
 
@@ -165,7 +165,7 @@ public class PolicyPageControllerTest extends PageControllerTest {
     @Test
     public void testUpdateEcValDisable() throws Exception {
 
-        System.out.println("XXXX testUpdateEcValDisable");
+        System.out.println("XXXX 4 testUpdateEcValDisable");
 
         //jamie prints
         List<PolicySettings> records1 = policyRepository.findAll();
@@ -176,8 +176,8 @@ public class PolicyPageControllerTest extends PageControllerTest {
 
         //init the database
         policy = policyRepository.findByName("Default");
-        policy.setPcValidationEnabled(false);
         policy.setEcValidationEnabled(true);
+        policy.setPcValidationEnabled(false);
         policy.setFirmwareValidationEnabled(false);
         policyRepository.save(policy);
 
@@ -239,7 +239,7 @@ public class PolicyPageControllerTest extends PageControllerTest {
     @Test
     public void testUpdatePcValEnable() throws Exception {
 
-        System.out.println("XXXX testUpdatePcValEnable");
+        System.out.println("XXXX 5 testUpdatePcValEnable");
 
         ResultActions actions;
 
@@ -298,12 +298,13 @@ public class PolicyPageControllerTest extends PageControllerTest {
     @Test
     public void testUpdatePcValDisable() throws Exception {
 
-        System.out.println("XXXX testUpdatePcValDisable");
+        System.out.println("XXXX 6 testUpdatePcValDisable");
 
         ResultActions actions;
 
         //init the database
         policy = policyRepository.findByName("Default");
+        policy.setEcValidationEnabled(true);
         policy.setPcValidationEnabled(true);
         policy.setPcAttributeValidationEnabled(false);
         policy.setFirmwareValidationEnabled(false);
@@ -325,10 +326,9 @@ public class PolicyPageControllerTest extends PageControllerTest {
         policy = policyRepository.findByName("Default");
         assertFalse(policy.isPcValidationEnabled());
 
-        // jamo this is making ec enable test not work
         //reset database for invalid policy test
-        policy.setPcAttributeValidationEnabled(true);
         policy.setPcValidationEnabled(true);
+        policy.setPcAttributeValidationEnabled(true);
         policy.setFirmwareValidationEnabled(false);
         policyRepository.save(policy);
 
@@ -359,14 +359,15 @@ public class PolicyPageControllerTest extends PageControllerTest {
     @Test
     public void testUpdatePcAttributeValEnable() throws Exception {
 
-        System.out.println("XXXX testUpdatePcAttributeValEnable");
+        System.out.println("XXXX 7 testUpdatePcAttributeValEnable");
 
         ResultActions actions;
 
         //init the database
         policy = policyRepository.findByName("Default");
-        policy.setPcAttributeValidationEnabled(false);
+        policy.setEcValidationEnabled(true);
         policy.setPcValidationEnabled(true);
+        policy.setPcAttributeValidationEnabled(false);
         policy.setFirmwareValidationEnabled(false);
         policyRepository.save(policy);
 
@@ -417,7 +418,7 @@ public class PolicyPageControllerTest extends PageControllerTest {
     @Test
     public void testUpdatePcAttributeValDisable() throws Exception {
 
-        System.out.println("XXXX testUpdatePcAttributeValDisable");
+        System.out.println("XXXX 8 testUpdatePcAttributeValDisable");
 
         ResultActions actions;
 
@@ -437,17 +438,5 @@ public class PolicyPageControllerTest extends PageControllerTest {
         policy = policyRepository.findByName("Default");
         assertFalse(policy.isPcAttributeValidationEnabled());
     }
-
-//    /**
-//     * Helper function to get a fresh load of the default policy from the DB.
-//     *
-//     * @return The default Supply Chain Policy
-//     */
-//    private SupplyChainPolicy getDefaultPolicy() {
-//        final Appraiser supplyChainAppraiser = appraiserManager.getAppraiser(
-//                SupplyChainAppraiser.NAME);
-//        return (SupplyChainPolicy) policyManager.getDefaultPolicy(
-//                supplyChainAppraiser);
-//    }
 
 }
