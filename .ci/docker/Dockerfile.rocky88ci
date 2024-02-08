@@ -57,5 +57,5 @@ RUN /bin/bash -c './gradlew clean build'
 WORKDIR "/"
 RUN rm -rf /hirsTemp
 
-RUN git clone https://github.com/nsacyber/HIRS.git
+RUN git clone https://github.com/iadgovuser62/HIRS62.git
 # CMD ["./HIRS/.ci/setup/container/setup_tpm2provisioner.sh"]
