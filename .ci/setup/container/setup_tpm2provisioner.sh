@@ -10,7 +10,7 @@ echo "Setting up TPM emulator for the TPM2 Provisioner"
 source /HIRS/.ci/setup/container/tpm2_common.sh
 
 #Wait for the ACA to spin up, if it hasnt already
-waitForAca
+#waitForAca
 
 # Install packages
 installProvisioner
