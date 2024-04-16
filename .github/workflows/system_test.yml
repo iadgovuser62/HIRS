@@ -28,6 +28,8 @@ jobs:
       continue-on-error: true
       shell: bash
       run: |
+        sudo apt-get install -y curl
+        export JAVA_HOME="/usr/lib/jvm/java-1.8.0-openjdk-1.8.0*/jre/bin"
         echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
         bash .ci/system-tests/run_system_tests.sh
     - name: Archive System Test Log files
