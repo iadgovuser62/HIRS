@@ -28,6 +28,9 @@ jobs:
       continue-on-error: true
       shell: bash
       run: |
+        #echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
+        # comment out the line above and uncomment the line below to run in a forked repo.
+        echo "${{ secrets.PKG_PWD }}" | docker login ghcr.io -u $ --password-stdin
         bash .ci/system-tests/run_system_tests.sh
     - name: Archive System Test Log files
       uses: actions/upload-artifact@v2
