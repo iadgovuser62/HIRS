@@ -3,8 +3,8 @@
 #    Script to run the System Tests  for HIRS TPM 2.0 Provisoner
 #
 #########################################################################################
-# Working directory = /HIRS/
-cd ../..
+# Uncomment the cd line below if running this script manually (To make Working directory = /HIRS/)
+# cd ../..
 
 # Setting variables
 aca_container=hirs-aca1
