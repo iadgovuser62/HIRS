@@ -28,8 +28,6 @@ jobs:
       continue-on-error: true
       shell: bash
       run: |
-        sudo apt-get install -y curl
-        export JAVA_HOME="/usr/lib/jvm/java-1.8.0-openjdk-1.8.0*/jre/bin"
         echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u $ --password-stdin
         # comment out the line above and uncomment the line below to run in a forked repo.
         #echo "${{ secrets.PKG_PWD }}" | docker login ghcr.io -u $ --password-stdin
