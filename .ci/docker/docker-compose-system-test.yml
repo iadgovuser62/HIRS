@@ -13,19 +13,19 @@ services:
             aliases:
               - ${HIRS_ACA_HOSTNAME}
 
-   tpmprovisioner:
-      image: ghcr.io/nsacyber/hirs/tpm2provisioner-dotnet-ci:latest
-      container_name: hirs-provisioner1-tpm2
-      depends_on:
-         - aca
-      volumes:
-         - ../../:/HIRS
-      environment:
-         - REF=${BRANCH_NAME}
-      command: ["bash", "-c", "/tmp/auto_clone_branch ${BRANCH_NAME} && tail -f /dev/null;"]
-      networks:
-         hirs_aca_system_tests:
-            ipv4_address: ${HIRS_ACA_PROVISIONER_TPM2_IP}
+   # tpmprovisioner:
+   #    image: ghcr.io/nsacyber/hirs/tpm2provisioner-dotnet-ci:latest
+   #    container_name: hirs-provisioner1-tpm2
+   #    depends_on:
+   #       - aca
+   #    volumes:
+   #       - ../../:/HIRS
+   #    environment:
+   #       - REF=${BRANCH_NAME}
+   #    command: ["bash", "-c", "/tmp/auto_clone_branch ${BRANCH_NAME} && tail -f /dev/null;"]
+   #    networks:
+   #       hirs_aca_system_tests:
+   #          ipv4_address: ${HIRS_ACA_PROVISIONER_TPM2_IP}
 
 networks:
    hirs_aca_system_tests:
