@@ -16,8 +16,8 @@ services:
    tpmprovisioner:
       image: ghcr.io/nsacyber/hirs/tpm2provisioner-dotnet-ci:latest
       container_name: hirs-provisioner1-tpm2
-      depends_on:
-         - aca
+      # depends_on:
+      #    - aca
       volumes:
          - ../../:/HIRS
       environment:
