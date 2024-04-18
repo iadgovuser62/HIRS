@@ -1,23 +1,23 @@
 services:
-   # aca:
-   #    image: ghcr.io/nsacyber/hirs/aca:latest
-   #    container_name: hirs-aca1
-   #    volumes:
-   #       - ../../:/HIRS
-   #    ports:
-   #       - "${HIRS_ACA_PORTAL_PORT}:${HIRS_ACA_PORTAL_CONTAINER_PORT}"
-   #    hostname: ${HIRS_ACA_HOSTNAME}
-   #    networks:
-   #       hirs_aca_system_tests:
-   #          ipv4_address: ${HIRS_ACA_PORTAL_IP}
-   #          aliases:
-   #            - ${HIRS_ACA_HOSTNAME}
+   aca:
+      image: ghcr.io/nsacyber/hirs/aca:latest
+      container_name: hirs-aca1
+      volumes:
+         - ../../:/HIRS
+      ports:
+         - "${HIRS_ACA_PORTAL_PORT}:${HIRS_ACA_PORTAL_CONTAINER_PORT}"
+      hostname: ${HIRS_ACA_HOSTNAME}
+      networks:
+         hirs_aca_system_tests:
+            ipv4_address: ${HIRS_ACA_PORTAL_IP}
+            aliases:
+              - ${HIRS_ACA_HOSTNAME}
 
    tpmprovisioner:
-      image: ghcr.io/nsacyber/hirs/tpm2provisioner-dotnet-ci:latest
+      image: ghcr.io/iadgovuser62/hirs/tpm2provisioner-dotnet-ci
       container_name: hirs-provisioner1-tpm2
-      # depends_on:
-      #    - aca
+      depends_on:
+         - aca
       volumes:
          - ../../:/HIRS
       environment:
