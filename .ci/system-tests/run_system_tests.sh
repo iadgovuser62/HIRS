@@ -5,12 +5,12 @@
 #########################################################################################
 # Uncomment the cd line below if running this script manually (To make Working directory = /HIRS/)
 # cd ../..
-echo "$BRANCH_NAME"
+cat .env
 # Setting variables
 aca_container=hirs-aca1
 tpm2_container=hirs-provisioner1-tpm2
 . ./.ci/docker/.env && set -a
-echo "$BRANCH_NAME"
+cat .env
 # Start System Testing Docker Environment
 echo "********  Setting up for HIRS System Tests for TPM 2.0 ******** "
 docker compose -f ./.ci/docker/docker-compose-system-test.yml up -d
