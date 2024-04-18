@@ -14,7 +14,7 @@ services:
               - ${HIRS_ACA_HOSTNAME}
 
    tpmprovisioner:
-      image: ghcr.io/nsacyber/hirs/tpm2provisioner-dotnet-ci
+      image: ghcr.io/nsacyber/hirs/tpm2provisioner_j-ci:latest
       container_name: hirs-provisioner1-tpm2
       depends_on:
          - aca
