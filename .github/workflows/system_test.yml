@@ -1,5 +1,6 @@
-# Sets up and runs HIRS System tests
-
+# This workflow will build HIRS, run system tests, and create artifacts consisting of ACA and Provisioner logs.
+# Updated: 04/18/2024
+#
 name: HIRS System Tests
 on: 
   push:
