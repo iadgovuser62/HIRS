@@ -16,7 +16,7 @@ echo "********  Setting up for HIRS System Tests for TPM 2.0 ******** "
 docker compose -f ./.ci/docker/docker-compose-system-test.yml up -d
 
 # Install HIRS provisioner and setup tpm2 emulator
-docker exec $tpm2_container sh -c "cd / && ./tmp/auto_clone_branch v3_issue_687 1> /dev/null && cd hirs && git branch"
+docker exec $tpm2_container sh -c "cd / && ./tmp/auto_clone_branch v3_issue_687 2>&1 /dev/null && cd hirs"
 docker exec $tpm2_container /.ci/setup/container/setup_tpm2provisioner_dotnet.sh
 echo "******** HIRS System Tests Complete ******** "
 
