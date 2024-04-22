@@ -20,8 +20,6 @@ services:
          - aca
       volumes:
          - ../../:/HIRS
-      environment:
-         - REF=v3_issue_687
       command: ["bash", "-c", "tail -f /dev/null;"]
       networks:
          hirs_aca_system_tests:
