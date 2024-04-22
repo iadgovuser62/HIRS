@@ -1,9 +1,10 @@
 #!/bin/bash
 #########################################################################################
 #    Script to run the System Tests  for HIRS TPM 2.0 Provisoner
-#
+#    Notes for running manually/locally (not from GitHub Actions)
+#    1. Uncomment the "cd ../.." line below to make working directory = /HIRS/
+#    2. Run with the desired HIRS branch as an argument (i.e. $./run_system_tests.sh main)
 #########################################################################################
-# Uncomment the cd line below if running this script manually (To make Working directory = /HIRS/)
 # cd ../..
 
 # Setting variables
@@ -15,8 +16,10 @@ tpm2_container=hirs-provisioner1-tpm2
 echo "********  Setting up for HIRS System Tests for TPM 2.0 ******** "
 docker compose -f ./.ci/docker/docker-compose-system-test.yml up -d
 
+# Switching to curren/desired branch
+docker exec $tpm2_container sh -c "cd / && ./tmp/auto_clone_branch $1 1> /dev/null && cd hirs"
+
 # Install HIRS provisioner and setup tpm2 emulator
-docker exec $tpm2_container sh -c "cd / && ./tmp/auto_clone_branch $1 1> /dev/null && cd hirs && git branch"
 docker exec $tpm2_container /.ci/setup/container/setup_tpm2provisioner_dotnet.sh
 echo "******** HIRS System Tests Complete ******** "
 
