@@ -10,7 +10,6 @@
 # Setting variables
 aca_container=hirs-aca1
 tpm2_container=hirs-provisioner1-tpm2
-. ./.ci/docker/.env && set -a
 
 # Start System Testing Docker Environment
 echo "********  Setting up for HIRS System Tests for TPM 2.0 ******** "
@@ -19,7 +18,8 @@ docker compose -f ./.ci/docker/docker-compose-system-test.yml up -d
 # Switching to current/desired branch
 docker exec $tpm2_container sh -c "cd / && ./tmp/auto_clone_branch $1 1> /dev/null && cd hirs"
 
-# Install HIRS provisioner and setup tpm2 emulator
+# Install HIRS Provisioner.Net and setup tpm2 simulator.
+# In doing so, tests a single provision between Provisioner.Net and ACA.
 docker exec $tpm2_container /.ci/setup/container/setup_tpm2provisioner_dotnet.sh
 
 # HERE is where other system tests will be called, including:
