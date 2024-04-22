@@ -16,7 +16,7 @@ tpm2_container=hirs-provisioner1-tpm2
 echo "********  Setting up for HIRS System Tests for TPM 2.0 ******** "
 docker compose -f ./.ci/docker/docker-compose-system-test.yml up -d
 
-# Switching to curren/desired branch
+# Switching to current/desired branch
 docker exec $tpm2_container sh -c "cd / && ./tmp/auto_clone_branch $1 1> /dev/null && cd hirs"
 
 # Install HIRS provisioner and setup tpm2 emulator
