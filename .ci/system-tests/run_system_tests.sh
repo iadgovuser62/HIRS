@@ -21,6 +21,9 @@ docker exec $tpm2_container sh -c "cd / && ./tmp/auto_clone_branch $1 1> /dev/nu
 
 # Install HIRS provisioner and setup tpm2 emulator
 docker exec $tpm2_container /.ci/setup/container/setup_tpm2provisioner_dotnet.sh
+
+# HERE is where other system tests will be called, including:
+# aca_policy_tests.sh, platform_cert_tests.sh, rim_system_tests.sh
 echo "******** HIRS System Tests Complete ******** "
 
 # Collecting ACA and Provisioner.Net logs for workflow artifact
