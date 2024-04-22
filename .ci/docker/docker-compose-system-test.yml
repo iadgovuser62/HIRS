@@ -21,7 +21,7 @@ services:
       volumes:
          - ../../:/HIRS
       environment:
-         - REF=${BRANCH_NAME}
+         - REF=v3_issue_687
       command: ["bash", "-c", "cd / && ./tmp/auto_clone_branch ${REF} && cd hirs && git branch && tail -f /dev/null;"]
       networks:
          hirs_aca_system_tests:
