@@ -21,10 +21,6 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
-    - name: Extract branch name
-      shell: bash
-      run: echo "BRANCH_NAME=${GITHUB_REF#refs/heads/}" >> .ci/docker/.env
-      id: branch_name
     - name: ACA TPM2 Tests
       continue-on-error: true
       shell: bash
@@ -32,7 +28,7 @@ jobs:
         # If on a forked repo, ensure that it has a new secret for the PAT
         # and replace secrets.PAT with the secret in the fork
         echo ${{ secrets.PAT }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-        bash .ci/system-tests/run_system_tests.sh v3_issue_687
+        bash .ci/system-tests/run_system_tests.sh ${GITHUB_REF#refs/heads/}
     - name: Archive System Test Log files
       uses: actions/upload-artifact@v3
       with:
