@@ -33,42 +33,42 @@ jobs:
         continue-on-error: true
         shell: bash
         run: |
-          base .ci/system-tests/tests/aca_policy_tests.sh 1
+          bash .ci/system-tests/tests/aca_policy_tests.sh 1
       - name: ACA Policy Test 2
         continue-on-error: true
         shell: bash
         run: |
-          base .ci/system-tests/tests/aca_policy_tests.sh 2
+          bash .ci/system-tests/tests/aca_policy_tests.sh 2
       - name: ACA Policy Test 3
         continue-on-error: true
         shell: bash
         run: |
-          base .ci/system-tests/tests/aca_policy_tests.sh 3
+          bash .ci/system-tests/tests/aca_policy_tests.sh 3
       - name: ACA Policy Test 4
         continue-on-error: true
         shell: bash
         run: |
-          base .ci/system-tests/tests/aca_policy_tests.sh 4
+          bash .ci/system-tests/tests/aca_policy_tests.sh 4
       - name: ACA Policy Test 5
         continue-on-error: true
         shell: bash
         run: |
-          base .ci/system-tests/tests/aca_policy_tests.sh 5
+          bash .ci/system-tests/tests/aca_policy_tests.sh 5
       - name: ACA Policy Test 6
         continue-on-error: true
         shell: bash
         run: |
-          base .ci/system-tests/tests/aca_policy_tests.sh 6
+          bash .ci/system-tests/tests/aca_policy_tests.sh 6
       - name: ACA Policy Test 7
         continue-on-error: true
         shell: bash
         run: |
-          base .ci/system-tests/tests/aca_policy_tests.sh 7
+          bash .ci/system-tests/tests/aca_policy_tests.sh 7
       - name: ACA Policy Test 8
         continue-on-error: true
         shell: bash
         run: |
-          base .ci/system-tests/tests/aca_policy_tests.sh 8
+          bash .ci/system-tests/tests/aca_policy_tests.sh 8
       - name: Copy System Test Log files
         continue-on-error: true
         shell: bash
