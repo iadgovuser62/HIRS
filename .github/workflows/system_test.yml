@@ -21,7 +21,7 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      - name: ACA TPM2 Tests
+      - name: ACA TPM2 System Test Setup
         continue-on-error: true
         shell: bash
         run: |
@@ -29,14 +29,59 @@ jobs:
           # and replace secrets.GITHUB_TOKEN with the secret in the fork
           echo ${{ secrets.PAT }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
           bash .ci/system-tests/run_system_tests.sh ${GITHUB_REF#refs/heads/}
-      - name: Compose Down + Return exit code
+      - name: ACA Policy Test 1
+        continue-on-error: true
         shell: bash
         run: |
-          # Clean up services and network
+          base .ci/system-tests/tests/aca_policy_tests.sh 1
+      - name: ACA Policy Test 2
+        continue-on-error: true
+        shell: bash
+        run: |
+          base .ci/system-tests/tests/aca_policy_tests.sh 2
+      - name: ACA Policy Test 3
+        continue-on-error: true
+        shell: bash
+        run: |
+          base .ci/system-tests/tests/aca_policy_tests.sh 3
+      - name: ACA Policy Test 4
+        continue-on-error: true
+        shell: bash
+        run: |
+          base .ci/system-tests/tests/aca_policy_tests.sh 4
+      - name: ACA Policy Test 5
+        continue-on-error: true
+        shell: bash
+        run: |
+          base .ci/system-tests/tests/aca_policy_tests.sh 5
+      - name: ACA Policy Test 6
+        continue-on-error: true
+        shell: bash
+        run: |
+          base .ci/system-tests/tests/aca_policy_tests.sh 6
+      - name: ACA Policy Test 7
+        continue-on-error: true
+        shell: bash
+        run: |
+          base .ci/system-tests/tests/aca_policy_tests.sh 7
+      - name: ACA Policy Test 8
+        continue-on-error: true
+        shell: bash
+        run: |
+          base .ci/system-tests/tests/aca_policy_tests.sh 8
+      - name: Copy System Test Log files
+        continue-on-error: true
+        shell: bash
+        run: |
+          echo "*** Extracting ACA and Provisioner.Net logs ..."
+          docker exec $aca_container sh -c "mkdir -p /HIRS/logs/aca/ && cp -arp /var/log/hirs/* /HIRS/logs/aca/"
+          docker exec $tpm2_container sh -c "mkdir -p /HIRS/logs/provisioner/ && cp -ap hirs*.log /HIRS/logs/provisioner/ && chmod -R 777 /HIRS/logs"
+      - name: Docker Compose Down
+        continue-on-error: true
+        shell: bash
+        run: |
           echo "*** Exiting and removing Docker containers and network ..."
           docker compose -f ./.ci/docker/docker-compose-system-test.yml down -v
-
-          # Return container exit code
           if [[ ${TEST_STATUS} == "0" ]]; then
             echo "******** SUCCESS: System Tests for TPM 2.0 passed ********"
             echo "TEST_STATUS=0" >> $GITHUB_ENV
