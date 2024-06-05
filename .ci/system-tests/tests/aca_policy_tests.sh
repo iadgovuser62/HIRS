@@ -11,7 +11,7 @@ test="all"
 
 # Start ACA Policy Tests
 # provisionTpm2 takes 1 parameter (the expected result): "pass" or "fail"
-echo test
+
 case $1 in
     1) test="1" ;;
     2) test="2" ;;
