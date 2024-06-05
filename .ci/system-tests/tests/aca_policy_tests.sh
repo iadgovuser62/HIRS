@@ -4,7 +4,7 @@
 #
 #########################################################################################
 source ./.ci/system-tests/sys_test_common.sh
-
+echo $1
 testResult=false
 totalTests=0;
 failedTests=0;
@@ -24,6 +24,8 @@ case $1 in
     8) test="8" ;;
 esac
 
+echo $test
+echo "$test"
 if [ "$test"="1" ] || [ "$test"="all" ]; then
     writeToLogs "### ACA POLICY TEST 1: Test ACA default policy  ###"
     setPlatformCerts "laptop" "empty"
