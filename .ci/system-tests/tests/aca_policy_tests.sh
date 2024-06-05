@@ -25,32 +25,32 @@ case $1 in
     *) echo "Unknown parameter passed: $1"; exit 1 ;;
 esac
 
-if [ test -eq 1 ] || [ test -eq all ]; then
+if [ test=1 ] || [ test=all ]; then
     writeToLogs "### ACA POLICY TEST 1: Test ACA default policy  ###"
     setPlatformCerts "laptop" "empty"
     provisionTpm2 "pass"
 fi
-if [ test -eq 2 ] || [ test -eq all ]; then
+if [ test=2 ] || [ test=all ]; then
     writeToLogs "### ACA POLICY TEST 2: Test EK cert Only Validation Policy without a EK Issuer Cert in the trust store ###"
     setPolicyEkOnly
     provisionTpm2 "fail"
 fi
-if [ test -eq 3 ] || [ test -eq all ]; then
+if [ test=3 ] || [ test=all ]; then
     writeToLogs "### ACA POLICY TEST 3: Test EK Only Validation Policy ###"
     uploadTrustedCerts
     provisionTpm2 "pass"
 fi
-if [ test -eq 4 ] || [ test -eq all ]; then
+if [ test=4 ] || [ test=all ]; then
     writeToLogs "### ACA POLICY TEST 4: Test PC Validation Policy with no PC ###"
     setPolicyEkPc_noAttCheck
     provisionTpm2 "fail"
 fi
-if [ test -eq 5 ] || [ test -eq all ]; then
+if [ test=5 ] || [ test=all ]; then
     writeToLogs "### ACA POLICY TEST 5: Test FW and PC Validation Policy with no PC ###"
     setPolicyEkPcFw
     provisionTpm2 "fail"
 fi
-if [ test -eq 6 ] || [ test -eq all ]; then
+if [ test=6 ] || [ test=all ]; then
     writeToLogs "### ACA POLICY TEST 6: Test PC Validation Policy with valid PC with no Attribute Check ###"
     clearAcaDb
     setPolicyEkPc_noAttCheck
@@ -58,7 +58,7 @@ if [ test -eq 6 ] || [ test -eq all ]; then
     setPlatformCerts "laptop" "default"
     provisionTpm2 "pass"
 fi
-if [ test -eq 7 ] || [ test -eq all ]; then
+if [ test=7 ] || [ test=all ]; then
     writeToLogs "### ACA POLICY TEST 7: Test PC Validation Policy with valid PC with Attribute Check ###"
     clearAcaDb
     setPolicyEkPc
@@ -67,7 +67,7 @@ if [ test -eq 7 ] || [ test -eq all ]; then
     setPlatformOutput
     provisionTpm2 "pass"
 fi
-if [ test -eq 8 ] || [ test -eq all ]; then
+if [ test=8 ] || [ test=all ]; then
     writeToLogs "### ACA POLICY TEST 8: Test PC with RIM Validation Policy with valid PC and RIM ###"
     clearAcaDb
     setPolicyEkPcFw
