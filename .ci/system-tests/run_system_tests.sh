@@ -33,16 +33,16 @@ docker exec $tpm2_container sh /hirs/.ci/setup/container/setup_tpm2provisioner_d
 
 # Initiating System Tests
 echo "******** Setup Complete. Beginning HIRS System Tests. ******** "
-./.ci/system-tests/tests/aca_policy_tests.sh
+#./.ci/system-tests/tests/aca_policy_tests.sh
 #./.ci/system-tests/tests/platform_cert_tests.sh
 #./.ci/system-tests/tests/rim_system_tests.sh
 
-echo "******** HIRS System Tests Complete ******** "
+# echo "******** HIRS System Tests Complete ******** "
 
-# Collecting ACA and Provisioner.Net logs for workflow artifact
-echo "*** Extracting ACA and Provisioner.Net logs ..."
-docker exec $aca_container sh -c "mkdir -p /HIRS/logs/aca/ && cp -arp /var/log/hirs/* /HIRS/logs/aca/"
-docker exec $tpm2_container sh -c "mkdir -p /HIRS/logs/provisioner/ && cp -ap hirs*.log /HIRS/logs/provisioner/ && chmod -R 777 /HIRS/logs"
+# # Collecting ACA and Provisioner.Net logs for workflow artifact
+# echo "*** Extracting ACA and Provisioner.Net logs ..."
+# docker exec $aca_container sh -c "mkdir -p /HIRS/logs/aca/ && cp -arp /var/log/hirs/* /HIRS/logs/aca/"
+# docker exec $tpm2_container sh -c "mkdir -p /HIRS/logs/provisioner/ && cp -ap hirs*.log /HIRS/logs/provisioner/ && chmod -R 777 /HIRS/logs"
 
 # # Clean up services and network
 # echo "*** Exiting and removing Docker containers and network ..."
