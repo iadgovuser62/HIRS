@@ -22,7 +22,6 @@ case $1 in
     6) test="6" ;;
     7) test="7" ;;
     8) test="8" ;;
-    *) echo "Unknown parameter passed: $1"; export TEST_STATUS=1 ;;
 esac
 
 if [ "$test"="1" ] || [ "$test"="all" ]; then
