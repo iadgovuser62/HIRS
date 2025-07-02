@@ -11,8 +11,7 @@ import java.nio.ByteBuffer;
  * Typical encoding is 59 01 XX where XX is a length
  */
 public class CborBstr {
-    @Getter
-    byte[] contents = null;
+    private final byte[] contents;
     private static int typeMask = 0xE0;
     private static int infoMask = 0x1F;
     private static int shiftOffset = 0x05;
@@ -22,7 +21,6 @@ public class CborBstr {
     public CborBstr(byte[] data) {
 
         byte type = data[0];
-        byte info = (byte) (type & infoMask);
         // Check if byte 0 is of major type 0x02 (Byte String)
         byte cborType = (byte) ((type & typeMask) >> shiftOffset);
         if (cborType != byteStringType) {
@@ -34,7 +32,6 @@ public class CborBstr {
 
     public static boolean isByteString(byte[] data) {
         byte type = data[0];
-        byte info = (byte) (type & infoMask);
         // Check if byte 0 is of major type 0x02 (Byte String)
         byte cborType = (byte) ((type & typeMask) >> shiftOffset);
         if (cborType == byteStringType) return true;
@@ -44,8 +41,7 @@ public class CborBstr {
     public static boolean isEmptyByteString(byte[] data) {
         if (!isByteString(data)) return false;
         // per the cose spec 0xa0 is equivalent to {}
-        if (data[3] == 0xa0) return true;
-        return false;
+        return (data[3] & 0xFF) == 0xA0;
     }
 
     /**
@@ -93,7 +89,6 @@ public class CborBstr {
     }
 
     public static byte[] removeByteStringIfPresent(byte[] data) {
-        byte type = data[0];
         if (!isByteString(data)) return data;
         int length = getByteStringTagLength(data);
         byte[] contents = new byte[data.length - length];
@@ -102,5 +97,7 @@ public class CborBstr {
         return contents;
     }
 
-
+    public byte[] getContents() {
+        return contents.clone(); // returns a copy, not the original
+    }
 }

@@ -7,7 +7,7 @@ package hirs.utils.signature.cose.Cbor;
  */
 public class CborItems {
 
-    private static final String[][] indexNames = null;
+    private static final String[][] indexNames = new String[0][0];
     public static final String UNKNOWN_STR = "Unknown";
     public static final int UNKNOWN_INT=99;
 
@@ -16,7 +16,6 @@ public class CborItems {
      * @return int index of the item
      */
     public static int getIndex(String itemName) {
-        int algId = 0;
         for (int i=0; i< indexNames.length; i++) {
             if (itemName.compareToIgnoreCase(indexNames[i][1])==0)
                 return i;
