@@ -8,6 +8,7 @@ import hirs.utils.rim.unsignedRim.cbor.ietfCorim.comid.ArmSwcompId;
 import hirs.utils.rim.unsignedRim.cbor.ietfCorim.comid.ComidSvn;
 import hirs.utils.rim.unsignedRim.cbor.ietfCorim.comid.RawValue;
 import hirs.utils.rim.unsignedRim.cbor.ietfCoswid.Coswid;
+import lombok.AccessLevel;
 import lombok.Getter;
 import org.ietf.jgss.GSSException;
 import org.ietf.jgss.Oid;
@@ -20,7 +21,9 @@ import java.util.UUID;
 
 @Getter
 public class CborTagProcessor {
+    @Getter(AccessLevel.NONE)
     byte[] content = null;
+
     boolean isTagged = false;
     boolean isCoswid = false;
     boolean isCose = false;
@@ -33,11 +36,11 @@ public class CborTagProcessor {
     int tagId = 0;
     String tagName = "";
     public static byte CBorTagByte = (byte) 0xC0;
-    public static int CoswidTagLength = 4;
-    public static int CborTypeLength = 1;
-    public static int cborTypeStart = 0;
-    public static int coswidStart = 0;
-    public static String CborCoswidTagStr = "CoSWID";
+    public final static int coswidTagLength = 4;
+    public final static int cborTypeLength = 1;
+    public final static int cborTypeStart = 0;
+    public final static int coswidStart = 0;
+    public final static String cborCoswidTagStr = "CoSWID";
     private static int tagMask = 0xE0;
     private static int infoMask = 0x1F;
     private static int offset = 0x05;
@@ -60,7 +63,7 @@ public class CborTagProcessor {
      * @param taggedData byte[]  Coswid data
      */
     public CborTagProcessor(byte[] taggedData) {
-        byte[] tagData = new byte[CoswidTagLength];
+        byte[] tagData = new byte[coswidTagLength];
         byte tagByte = taggedData[cborTypeStart];
         byte cborType = (byte) ((tagByte & tagMask) >> offset);
         byte tagInfo = (byte) (tagByte & infoMask);
@@ -112,6 +115,7 @@ public class CborTagProcessor {
                 return;
             } else if (tagId == BER_OID_TAG) {
                 int contentLength = taggedData.length - 3;
+                content = new byte[contentLength];
                 isOid = true;
                 System.arraycopy(taggedData, 3, content, 0, contentLength);
                 CborBstr oidStr = new CborBstr(content);
@@ -133,21 +137,21 @@ public class CborTagProcessor {
                 return;
             }
 
-            System.arraycopy(taggedData, CborTypeLength, tagData, cborTypeStart, CoswidTagLength);
+            System.arraycopy(taggedData, cborTypeLength, tagData, cborTypeStart, coswidTagLength);
             int dataTag = ByteBuffer.wrap(tagData).getInt();
             // Process tags
             if (dataTag == Coswid.ianaTag) {
-                tagName = CborCoswidTagStr;
+                tagName = cborCoswidTagStr;
                 tagId = Coswid.ianaTag;
                 isCoswid = true;
-                byte[] byteArrayData = new byte[taggedData.length - CoswidTagLength - CborTypeLength];
-                System.arraycopy(taggedData, CoswidTagLength + CborTypeLength, byteArrayData, coswidStart, taggedData.length - CoswidTagLength - CborTypeLength);
+                byte[] byteArrayData = new byte[taggedData.length - coswidTagLength - cborTypeLength];
+                System.arraycopy(taggedData, coswidTagLength + cborTypeLength, byteArrayData, coswidStart, taggedData.length - coswidTagLength - cborTypeLength);
                 // Remove Cbor ByteString encoding to get Coswid Data
                 CborBstr ctag = new CborBstr(byteArrayData);
                 content = ctag.getContents();
             }
             // Add future tag processing here
-            else content = taggedData;
+            else content = taggedData.clone();
         }
         // Data not tagged
         else {
@@ -204,12 +208,12 @@ public class CborTagProcessor {
         }
         else if (taggedItem.getTagNumber().intValue() == 0x228) { // tagged-svn
             // See section 5.1.4.1.4.4 in the IETF CoRIM specification
-            var comidSvn = new ComidSvn((int)taggedItem.getTagContent().parse());
+            var comidSvn = new ComidSvn((Integer) taggedItem.getTagContent().parse());
             return Optional.of(comidSvn);
         }
         else if (taggedItem.getTagNumber().intValue() == 0x229) { // tagged-min-svn
             // See section 5.1.4.1.4.4 in the IETF CoRIM specification
-            var comidMinSvn = new ComidSvn((int)taggedItem.getTagContent().parse());
+            var comidMinSvn = new ComidSvn((Integer) taggedItem.getTagContent().parse());
             comidMinSvn.setMinSvn(true);
             return Optional.of(comidMinSvn);
         }
@@ -239,5 +243,9 @@ public class CborTagProcessor {
         }
 
         return Optional.empty();
+    }
+
+    public byte[] getContent() {
+        return content == null ? null : content.clone();
     }
 }

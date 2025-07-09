@@ -21,6 +21,7 @@ import com.authlete.cose.SigStructureBuilder;
 import hirs.utils.crypto.AlgorithmsIds;
 import hirs.utils.signature.SignatureFormat;
 import hirs.utils.signature.cose.Cbor.CborTagProcessor;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -55,27 +56,19 @@ import java.util.List;
  *        This is the "signature" field of the COSE_Signature or COSE_Sign1 structure.
  */
 public class CoseSignature implements SignatureFormat {
-    @Setter
-    @Getter
+
     byte[] toBeSigned = null;
-    @Setter
-    @Getter
+
     byte[] payload = null;
-    @Setter
-    @Getter
+
     byte[] signature = null;
     // COSE Generic Header
     @Setter
     @Getter
     int alg_id = 0;
-    @Setter
-    @Getter
     byte[] keyId = null;
-    @Setter
-    @Getter
     byte[] protectedHeaders = null;
     COSESign1Builder coseBuilder = null;
-    SigStructure signatureData = null;
 
     /**
      * Default CoseSignature constructor
@@ -159,6 +152,10 @@ public class CoseSignature implements SignatureFormat {
      */
     public byte[] createToBeSigned(X509Certificate signCert, byte[] data, COSEProtectedHeader protectedHeader)
             throws NoSuchAlgorithmException {
+        if(signCert == null)
+            throw new RuntimeException("COSE Signature Failure: Signer Certificate waS not provided");
+        if(signCert == null)
+            throw new RuntimeException("COSE Signature Failure: Signer PrivateKey was not provided");
         CoseAlgorithm cAlgorithm = new CoseAlgorithm();
         coseBuilder = new COSESign1Builder();
         String alg = AlgorithmsIds.translateAlgId(AlgorithmsIds.ALG_TYPE_SIG, AlgorithmsIds.SPEC_X509_ALG, signCert.getSigAlgName(), AlgorithmsIds.SPEC_COSE_ALG);
@@ -169,10 +166,6 @@ public class CoseSignature implements SignatureFormat {
             throw new RuntimeException("COSE Signature Failure: Algorithm ID was not provided");
         if (skid.length == 0)
             throw new RuntimeException("COSE Signature Failure: Key Identifier was not provided");
-        if(signCert == null)
-            throw new RuntimeException("COSE Signature Failure: Signer Certificate waS not provided");
-        if(signCert == null)
-            throw new RuntimeException("COSE Signature Failure: Signer PrivateKey was not provided");
         return finalizeToBeSigned(data, protectedHeader);
     }
 
@@ -191,6 +184,10 @@ public class CoseSignature implements SignatureFormat {
      */
     @Override
     public byte[] createToBeSigned(X509Certificate signCert, byte[] data) throws IOException, NoSuchAlgorithmException {
+        if(signCert == null)
+            throw new RuntimeException("COSE Signature Failure: Signer Certificate waS not provided");
+        if(signCert == null)
+            throw new RuntimeException("COSE Signature Failure: Signer PrivateKey was not provided");
         CoseAlgorithm cAlgorithm = new CoseAlgorithm();
         coseBuilder = new COSESign1Builder();
         String alg = AlgorithmsIds.translateAlgId(AlgorithmsIds.ALG_TYPE_SIG, AlgorithmsIds.SPEC_X509_ALG, signCert.getSigAlgName(), AlgorithmsIds.SPEC_COSE_ALG);
@@ -201,10 +198,6 @@ public class CoseSignature implements SignatureFormat {
             throw new RuntimeException("COSE Signature Failure: Algorithm ID was not provided");
         if (skid.length == 0)
             throw new RuntimeException("COSE Signature Failure: Key Identifier was not provided");
-        if(signCert == null)
-            throw new RuntimeException("COSE Signature Failure: Signer Certificate waS not provided");
-        if(signCert == null)
-            throw new RuntimeException("COSE Signature Failure: Signer PrivateKey was not provided");
         COSEProtectedHeader pHeader = new COSEProtectedHeaderBuilder().alg(alg_id).kid(skid).build();
         return finalizeToBeSigned(data, pHeader);
     }
@@ -239,12 +232,10 @@ public class CoseSignature implements SignatureFormat {
      */
     public byte[] getToBeVerified (byte[] coseData) {
         CBORDecoder cborDecoder = new CBORDecoder(coseData);
-        COSESign1 sign1 = null;
+
         String process = "Processing toBeSigned for verification: ";
         String status = "Parsing Cose Tag, expecting tag 18 (cose-sign1):";
-        CBORDecoderOptions options = cborDecoder.getOptions();
-        CBORTagProcessor tag = options.getTagProcessor(CoseType.coseSign1);
-        CoseAlgorithm ca = new CoseAlgorithm();
+
         CborTagProcessor ctp = new CborTagProcessor(coseData);
         int coseTag = ctp.getTagId();
         if (coseTag != CoseType.coseSign1) {
@@ -296,22 +287,18 @@ public class CoseSignature implements SignatureFormat {
             throw new RuntimeException("Error: " + process+status+" :" + e.getMessage());
         } catch (COSEException e) {
             throw new RuntimeException("Error: " + process+status+" :" + e.getMessage());
-        } catch (NullPointerException e) {
-            throw new RuntimeException("Error: " + process+status+" :" + e.getMessage());
         }
     }
 
     public byte[] getToBeVerified (byte[] coseData, byte[] detachedPayload){
-        CoseAlgorithm cAlgorithm = new CoseAlgorithm();
+
         coseBuilder = new COSESign1Builder();
         CBORDecoder cborDecoder = new CBORDecoder(coseData);
         COSEProtectedHeader pheader = null;
         COSESign1 sign1 = null;
         String process = "Processing toBeSigned for verification: ";
         String status = "Parsing Cose Tag, expecting tag 18 (cose-sign1):";
-        CBORDecoderOptions options = cborDecoder.getOptions();
-        CBORTagProcessor tag = options.getTagProcessor(CoseType.coseSign1);
-        CoseAlgorithm ca = new CoseAlgorithm();
+
         CborTagProcessor ctp = new CborTagProcessor(coseData);
         int coseTag = ctp.getTagId();
         if (coseTag != CoseType.coseSign1) {
@@ -364,7 +351,7 @@ public class CoseSignature implements SignatureFormat {
      * @param  signatureBytes data generated from step 3. Note step 3 is performed by a Cryptographic Engine
      */
     public void addSignature(byte[] signatureBytes) throws IOException {
-        signature = signatureBytes;
+        signature = signatureBytes.clone();
         coseBuilder.signature(signatureBytes);
     }
 
@@ -376,7 +363,7 @@ public class CoseSignature implements SignatureFormat {
     public byte[] getSignedData( ) throws IOException {
         COSESign1 signatureData = coseBuilder.build();
         // Set local variables for future use
-        byte[] rawSignature = signatureData.getSignature().getValue();
+
         protectedHeaders = signatureData.getProtectedHeader().getValue();
         CBORTaggedItem taggedCose = new CBORTaggedItem(CoseType.coseSign1, signatureData);
         return taggedCose.encode();
@@ -400,5 +387,49 @@ public class CoseSignature implements SignatureFormat {
     public void setNilPayload() {
 
         coseBuilder.payload(CBORNull.INSTANCE);
+    }
+
+    public byte[] getToBeSigned() {
+        return toBeSigned == null ? null : toBeSigned.clone();
+    }
+
+    public byte[] getPayload() {
+        return payload == null ? null : payload.clone();
+    }
+
+    public byte[] getSignature() {
+        return signature == null ? null : signature.clone();
+    }
+
+    public byte[] getKeyId() {
+        return keyId == null ? null : keyId.clone();
+    }
+
+    public byte[] getProtectedHeaders() {
+        return protectedHeaders == null ? null : protectedHeaders.clone();
+    }
+
+    public void setToBeSigned(byte[] toBeSigned) {
+        this.toBeSigned = toBeSigned == null ? null : toBeSigned.clone();
+    }
+
+    public void setPayload(byte[] payload) {
+        this.payload = payload == null ? null : payload.clone();
+    }
+
+    public void setSignature(byte[] signature) {
+        this.signature = signature == null ? null : signature.clone();
+    }
+
+    public void setAlg_id(int alg_id) {
+        this.alg_id = alg_id;
+    }
+
+    public void setKeyId(byte[] keyId) {
+        this.keyId = keyId == null ? null : keyId.clone();
+    }
+
+    public void setProtectedHeaders(byte[] protectedHeaders) {
+        this.protectedHeaders = protectedHeaders == null ? null : protectedHeaders.clone();
     }
 }

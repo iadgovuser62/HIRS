@@ -18,6 +18,7 @@ import hirs.utils.rim.unsignedRim.cbor.ietfCorim.CoRimParser;
 import hirs.utils.rim.unsignedRim.cbor.ietfCorim.MetaMap;
 import hirs.utils.rim.unsignedRim.cbor.ietfCoswid.Coswid;
 import hirs.utils.rim.unsignedRim.cbor.tcgCompRimCoswid.TcgCompRimCoswidParser;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -33,14 +34,11 @@ public class CoseParser {
     @Setter
     @Getter
     int coseTag = 0;
-    @Setter
-    @Getter
+
     byte[] toBeSigned = null;
-    @Setter
-    @Getter
+
     byte[] payload = null;
-    @Setter
-    @Getter
+
     byte[] signature = null;
     // COSE Generic Header
     @Setter
@@ -49,8 +47,7 @@ public class CoseParser {
     @Setter
     @Getter
     String algIdentifier = "";
-    @Setter
-    @Getter
+
     byte[] keyIdBytes = null;
     @Setter
     @Getter
@@ -58,33 +55,25 @@ public class CoseParser {
     @Setter
     @Getter
     String contentType = "";
-    @Setter
-    @Getter
+
     byte[] protectedHeaders = null;
     @Setter
     @Getter
     String autheleteDecode = "";
-    boolean isPayloadTagged = false;
-    COSESign1Builder coseBuilder = null;
-    SigStructure signatureData = null;
-    CBORItem coseObject = null;
+
     CborTagProcessor cborTag = null;
-    public static int coseSign1 = 18;
+
     MetaMap mmap = null;
     /**
      * Parser constructor to fill calss variables
      * @param coseData Byte array holding the COSE data
      */
     public CoseParser(byte[] coseData ) {
-        CoseSignature cs = new CoseSignature();
 
         CBORDecoder cborDecoder = new CBORDecoder(coseData);
         COSESign1 sign1 = null;
         String process = "Processing Cose toBeSigned for verification: ";
         String status = "Parsing Cose Tag, expecting tag 18 (cose-sign1):";
-        CBORDecoderOptions options = cborDecoder.getOptions();
-        CBORTagProcessor tag = options.getTagProcessor(CoseType.coseSign1);
-        CoseAlgorithm ca = new CoseAlgorithm();
 
         CborTagProcessor ctp = new CborTagProcessor(coseData);
         coseTag = ctp.getTagId();
@@ -190,7 +179,7 @@ public class CoseParser {
      * @param tag the CBOR Tag (int) defined in Table 1
      * @return a String defined in Table 1 that corresponds to the tag
      */
-    public String CoseTagLookup(int tag){
+    public String coseTagLookup(int tag){
         String coseType = "";
         switch (tag) {
             case 98: coseType = "cose-sign"; break;
@@ -226,7 +215,7 @@ public class CoseParser {
        boolean isCoRim = false;
        if (format.compareToIgnoreCase("pretty")==0) {
            returnString = "COSE Signed object:\n";
-           returnString += "tag = " + CoseTagLookup(coseTag) + "\n";
+           returnString += "tag = " + coseTagLookup(coseTag) + "\n";
            returnString += "Protected Header Contents: " + "\n";
            returnString += "  Algorithm = " + algIdentifier + "\n";
            returnString += "  KeyId = " + keyIdentifier + "\n";
@@ -270,6 +259,47 @@ public class CoseParser {
            returnString = autheleteDecode;
        }
         return returnString;
+    }
+
+    public byte[] getToBeSigned() {
+        return toBeSigned == null ? null : toBeSigned.clone();
+    }
+
+    public byte[] getPayload() {
+        return payload == null ? null : payload.clone();
+    }
+
+    public byte[] getSignature() {
+        return signature == null ? null : signature.clone();
+    }
+
+    public byte[] getKeyIdBytes() {
+        return keyIdBytes == null ? null : keyIdBytes.clone();
+    }
+
+    public byte[] getProtectedHeaders() {
+        return protectedHeaders == null ? null : protectedHeaders.clone();
+    }
+
+    // ✅ Safe SETTERS
+    public void setToBeSigned(byte[] toBeSigned) {
+        this.toBeSigned = toBeSigned == null ? null : toBeSigned.clone();
+    }
+
+    public void setPayload(byte[] payload) {
+        this.payload = payload == null ? null : payload.clone();
+    }
+
+    public void setSignature(byte[] signature) {
+        this.signature = signature == null ? null : signature.clone();
+    }
+
+    public void setKeyIdBytes(byte[] keyIdBytes) {
+        this.keyIdBytes = keyIdBytes == null ? null : keyIdBytes.clone();
+    }
+
+    public void setProtectedHeaders(byte[] protectedHeaders) {
+        this.protectedHeaders = protectedHeaders == null ? null : protectedHeaders.clone();
     }
 
 }
