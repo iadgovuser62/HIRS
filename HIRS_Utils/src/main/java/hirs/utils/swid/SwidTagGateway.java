@@ -61,6 +61,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.InvalidAlgorithmParameterException;
@@ -165,9 +166,7 @@ public class SwidTagGateway {
         } catch (JAXBException e) {
             System.out.println("Error initializing jaxbcontext: " + e.getMessage());
         } catch (ParserConfigurationException e) {
-            System.out.println("Error instantiating Document object for parsing swidtag: "
-                    + e.getMessage());
-            System.exit(1);
+            throw new RuntimeException("Error instantiating Document object for parsing swidtag: " + e.getMessage(), e);
         }
     }
 
@@ -235,19 +234,15 @@ public class SwidTagGateway {
                 Document signedSoftwareIdentity = signXMLDocument(swidtag);
                 writeSwidTagFile(signedSoftwareIdentity, filename);
             } else {
-                System.out.println("The following fields cannot be empty or null: "
+                throw new RuntimeException("The following fields cannot be empty or null: "
                         + errorRequiredFields.substring(0, errorRequiredFields.length() - 2));
-                System.exit(1);
             }
         } catch (JsonException e) {
-            System.out.println("Error reading JSON attributes: " + e.getMessage());
-            System.exit(1);
+            throw new RuntimeException("Error reading JSON attributes: " + e.getMessage());
         } catch (FileNotFoundException e) {
-            System.out.println("File does not exist or cannot be read: " + e.getMessage());
-            System.exit(1);
+            throw new RuntimeException("File does not exist or cannot be read: " + e.getMessage());
         } catch (Exception e) {
-            System.out.println(e.getMessage());
-            System.exit(1);
+            throw new RuntimeException(e.getMessage());
         }
     }
 
@@ -550,9 +545,7 @@ public class SwidTagGateway {
             doc = builder.newDocument();
             marshaller.marshal(element, doc);
         } catch (JAXBException e) {
-            System.out.println("Error while marshaling swidtag: " + e.getMessage());
-            e.printStackTrace();
-            System.exit(1);
+            throw new RuntimeException("Error while marshaling swidtag:" + e.getMessage(), e);
         }
 
         return doc;
@@ -578,9 +571,7 @@ public class SwidTagGateway {
                     null
             );
         } catch (NoSuchAlgorithmException | InvalidAlgorithmParameterException e) {
-            System.out.println("Error while creating enveloped signature Reference: "
-                    + e.getMessage());
-            System.exit(1);
+            throw new RuntimeException("Error while creating enveloped signature Reference: " + e.getMessage(), e);
         }
 
         List<Reference> refList = new ArrayList<Reference>();
@@ -594,9 +585,7 @@ public class SwidTagGateway {
                         sigFactory.newDigestMethod(DigestMethod.SHA256, null)
                 );
             } catch (NoSuchAlgorithmException | InvalidAlgorithmParameterException e) {
-                System.out.println("Error while creating timestamp Reference: "
-                        + e.getMessage());
-                System.exit(1);
+                throw new RuntimeException("Error while creating timestamp Reference: " + e.getMessage(), e);
             }
             refList.add(timestampRef);
             xmlObjectList = Collections.singletonList(createXmlTimestamp(doc, sigFactory));
@@ -612,8 +601,7 @@ public class SwidTagGateway {
                     refList
             );
         } catch (NoSuchAlgorithmException | InvalidAlgorithmParameterException e) {
-            System.out.println("Error while creating SignedInfo: " + e.getMessage());
-            System.exit(1);
+            throw new RuntimeException("Error while creating SignedInfo: " + e.getMessage(), e);
         }
         List<XMLStructure> keyInfoElements = new ArrayList<XMLStructure>();
 
@@ -627,8 +615,7 @@ public class SwidTagGateway {
             try {
                 cp.parsePEMCredentials(pemCertificateFile, pemPrivateKeyFile);
             } catch (Exception e) {
-                System.out.println("Error while parsing PEM files: " + e.getMessage());
-                System.exit(1);
+                throw new RuntimeException("Error while parsing PEM files: " + e.getMessage(), e);
             }
             X509Certificate certificate = cp.getCertificate();
             privateKey = cp.getPrivateKey();
@@ -650,8 +637,7 @@ public class SwidTagGateway {
             KeyName keyName = kiFactory.newKeyName(cp.getCertificateSubjectKeyIdentifier());
             keyInfoElements.add(keyName);
         } catch (IOException e) {
-            System.out.println("Error while getting SKID: " + e.getMessage());
-            System.exit(1);
+            throw new RuntimeException("Error while getting SKID: " + e.getMessage(), e);
         }
         KeyInfo keyinfo = kiFactory.newKeyInfo(keyInfoElements);
 
@@ -694,10 +680,9 @@ public class SwidTagGateway {
                             SwidTagConstants.RFC3852_NS);
                     timeStampElement.setAttributeNS(SwidTagConstants.RFC3852_NS,
                             SwidTagConstants.RFC3852_PFX + ":" + SwidTagConstants.DATETIME,
-                            new String(counterSignature));
+                            new String(counterSignature, StandardCharsets.UTF_8));
                 } catch (IOException e) {
-                    e.printStackTrace();
-                    System.exit(1);
+                    throw new RuntimeException(e.getMessage(), e);
                 }
                 break;
             case "RFC3339":
@@ -715,6 +700,8 @@ public class SwidTagGateway {
                             timestampArgument);
                 }
                 break;
+            default:
+                throw new IllegalArgumentException("Unsupported timestamp format: " + timestampFormat);
         }
         DOMStructure timestampObject = new DOMStructure(timeStampElement);
         SignatureProperty signatureProperty = sigFactory.newSignatureProperty(

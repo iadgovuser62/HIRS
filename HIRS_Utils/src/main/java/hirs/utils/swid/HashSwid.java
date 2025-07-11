@@ -108,7 +108,7 @@ public class HashSwid {
         } catch (UnsupportedEncodingException | NoSuchAlgorithmException grex) {
             System.out.println(grex.getMessage());
         } catch (IOException ioEx) {
-            System.out.println(String.format("%s: \n%s is not valid...",
+            System.out.println(String.format("%s: %n%s is not valid...",
                     ioEx.getMessage(), value));
         } finally {
             try {

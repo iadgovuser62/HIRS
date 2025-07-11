@@ -1,5 +1,6 @@
 package hirs.utils.swid;
 
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import org.bouncycastle.asn1.x509.AccessDescription;
@@ -23,6 +24,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyStore;
@@ -54,7 +57,7 @@ public class CredentialParser {
     private static final String CERTIFICATE_HEADER = "-----BEGIN CERTIFICATE-----";
     private static final String CERTIFICATE_FOOTER = "-----END CERTIFICATE-----";
 
-    @Setter
+    @Getter(AccessLevel.NONE)
     private X509Certificate certificate;
 
     private PrivateKey privateKey;
@@ -97,7 +100,7 @@ public class CredentialParser {
                     + System.lineSeparator()
                     + pemString
                     + System.lineSeparator()
-                    + CERTIFICATE_FOOTER).getBytes());
+                    + CERTIFICATE_FOOTER).getBytes(StandardCharsets.UTF_8));
             return (X509Certificate) factory.generateCertificate(inputStream);
         } catch (CertificateException e) {
             throw e;
@@ -173,30 +176,29 @@ public class CredentialParser {
      * @return
      */
     private PrivateKey parsePEMPrivateKey(String filename, String algorithm) throws Exception {
-        PrivateKey privateKey = null;
-        FileInputStream fis = null;
-        DataInputStream dis = null;
         String errorMessage = "";
-        try {
-            File file = new File(filename);
-            fis = new FileInputStream(file);
-            dis = new DataInputStream(fis);
-            byte[] key = new byte[(int) file.length()];
-            dis.readFully(key);
-            dis.close();
+        File file = new File(filename);
+        byte[] key;
 
-            String privateKeyStr = new String(key);
+        try (FileInputStream fis = new FileInputStream(file);
+             DataInputStream dis = new DataInputStream(fis)) {
+
+            key = new byte[(int) file.length()];
+            dis.readFully(key);
+
+            String privateKeyStr = new String(key, StandardCharsets.UTF_8);
             if (privateKeyStr.contains(PKCS1_HEADER)) {
-                privateKey = getPKCS1KeyPair(filename).getPrivate();
+                return getPKCS1KeyPair(filename).getPrivate();
             } else if (privateKeyStr.contains(PKCS8_HEADER)) {
-                privateKeyStr = privateKeyStr.replace(PKCS8_HEADER, "");
-                privateKeyStr = privateKeyStr.replace(PKCS8_FOOTER, "");
+                privateKeyStr = privateKeyStr
+                        .replace(PKCS8_HEADER, "")
+                        .replace(PKCS8_FOOTER, "");
 
                 byte[] decodedKey = Base64.decode(privateKeyStr);
                 PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(decodedKey);
                 KeyFactory keyFactory = KeyFactory.getInstance(algorithm);
 
-                privateKey = keyFactory.generatePrivate(spec);
+                return keyFactory.generatePrivate(spec);
             }
         } catch (FileNotFoundException e) {
             errorMessage += "Unable to locate private key file: " + filename;
@@ -208,23 +210,10 @@ public class CredentialParser {
             errorMessage += "IOException: " + e.getMessage();
         } catch (InvalidKeySpecException e) {
             errorMessage += "Error instantiating PKCS8EncodedKeySpec object: " + e.getMessage();
-        } finally {
-            try {
-                if (fis != null) {
-                    fis.close();
-                }
-                if (dis != null) {
-                    dis.close();
-                }
-            } catch (IOException e) {
-                errorMessage += "Error closing input stream: " + e.getMessage();
-            }
-            if (!errorMessage.isEmpty()) {
-                throw new Exception("Error parsing private key: " + errorMessage);
-            }
+        } if (!errorMessage.isEmpty()) {
+            throw new Exception("Error parsing private key: " + errorMessage);
         }
-
-        return privateKey;
+        return null;
     }
 
     /**
@@ -235,11 +224,13 @@ public class CredentialParser {
      */
     private KeyPair getPKCS1KeyPair(String filename) throws IOException {
         Security.addProvider(new BouncyCastleProvider());
-        PEMParser pemParser = new PEMParser(new FileReader(filename));
-        JcaPEMKeyConverter converter = new JcaPEMKeyConverter().setProvider("BC");
-        KeyPair keyPair = converter.getKeyPair((PEMKeyPair) pemParser.readObject());
 
-        return keyPair;
+        try (FileInputStream fis = new FileInputStream(filename);
+             InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.UTF_8);
+             PEMParser pemParser = new PEMParser(isr)) {
+            JcaPEMKeyConverter converter = new JcaPEMKeyConverter().setProvider("BC");
+            return converter.getKeyPair((PEMKeyPair) pemParser.readObject());
+        }
     }
 
     /**
@@ -252,11 +243,10 @@ public class CredentialParser {
      */
     private KeyStore.PrivateKeyEntry parseKeystorePrivateKey(String keystoreFile, String alias,
                                                              String password) {
-        KeyStore keystore = null;
         KeyStore.PrivateKeyEntry privateKey = null;
-        try {
-            keystore = KeyStore.getInstance("JKS");
-            keystore.load(new FileInputStream(keystoreFile), password.toCharArray());
+        try (FileInputStream fis = new FileInputStream(keystoreFile)) {
+            KeyStore keystore = KeyStore.getInstance("JKS");
+            keystore.load(fis, password.toCharArray());
             privateKey = (KeyStore.PrivateKeyEntry) keystore.getEntry(alias,
                     new KeyStore.PasswordProtection(password.toCharArray()));
         } catch (FileNotFoundException e) {
@@ -265,7 +255,6 @@ public class CredentialParser {
                  CertificateException | IOException e) {
             e.printStackTrace();
         }
-
         return privateKey;
     }
 
@@ -300,12 +289,13 @@ public class CredentialParser {
      * @throws IOException
      */
     public String getCertificateSubjectKeyIdentifier() throws IOException {
-        String decodedValue = null;
         byte[] extension = certificate.getExtensionValue(Extension.subjectKeyIdentifier.getId());
-        if (extension != null && extension.length > 0) {
-            decodedValue = JcaX509ExtensionUtils.parseExtensionValue(extension).toString();
+        if (extension == null || extension.length == 0) {
+            throw new IOException("Subject Key Identifier extension not found in certificate.");
         }
-        return decodedValue.substring(1);//Drop the # at the beginning of the string
+
+        String decodedValue = JcaX509ExtensionUtils.parseExtensionValue(extension).toString();
+        return decodedValue.substring(1); // Drop the # at the beginning of the string
     }
 
     /**
@@ -316,11 +306,35 @@ public class CredentialParser {
      * @throws IOException
      */
     public String getCertificateSubjectKeyIdentifier(X509Certificate certificate) throws IOException {
-        String decodedValue = null;
         byte[] extension = certificate.getExtensionValue(Extension.subjectKeyIdentifier.getId());
-        if (extension != null && extension.length > 0) {
-            decodedValue = JcaX509ExtensionUtils.parseExtensionValue(extension).toString();
+        if (extension == null || extension.length == 0) {
+            throw new IOException("Subject Key Identifier extension not found in certificate.");
         }
-        return decodedValue.substring(1);//Drop the # at the beginning of the string
+
+        String decodedValue = JcaX509ExtensionUtils.parseExtensionValue(extension).toString();
+        return decodedValue.substring(1); // Drop the # at the beginning of the string
     }
+
+    public X509Certificate getCertificate() {
+        try {
+            return (X509Certificate) CertificateFactory.getInstance("X.509")
+                    .generateCertificate(new ByteArrayInputStream(certificate.getEncoded()));
+        } catch (CertificateException e) {
+            throw new RuntimeException("Failed to clone certificate", e);
+        }
+    }
+
+    public void setCertificate(X509Certificate cert) {
+        if (cert == null) {
+            this.certificate = null;
+            return;
+        }
+        try {
+            this.certificate = (X509Certificate) CertificateFactory.getInstance("X.509")
+                    .generateCertificate(new ByteArrayInputStream(cert.getEncoded()));
+        } catch (CertificateException e) {
+            throw new IllegalArgumentException("Failed to copy certificate", e);
+        }
+    }
+
 }

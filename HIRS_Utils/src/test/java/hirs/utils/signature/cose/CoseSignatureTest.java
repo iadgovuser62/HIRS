@@ -12,6 +12,7 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * Tests the toBeSigned() for COSE_SIGN1 structures used by TCG Component RIM
@@ -88,6 +89,7 @@ public class CoseSignatureTest {
         byte[] signature  =  coseSig.getSignature();
 
         assertArrayEquals(sigData, signature);
+        assertNotNull(toBeVerified);
     }
 
     /**
