@@ -1,3 +1,7 @@
+plugins {
+    id 'com.diffplug.spotless' version '6.25.0'
+}
+
 // Get version from main project gradle
 def packVersion = properties.get("packageVersion")
 def jarVersion = properties.get("jarVersion")
@@ -54,6 +58,19 @@ jar {
     }
     //jar name format: [archiveBaseName]-[archiveAppendix]-[archiveVersion]-[archiveClassifier].[archiveExtension]
     archiveVersion = jarVersion
+}
+
+spotless {
+    java {
+        eclipse() // or googleJavaFormat(), depending on style
+        target 'src/main/java/hirs/utils/crypto/**/*.java'
+    }
+}
+
+tasks.named('checkstyleMain') {
+    source = files(
+            'src/main/java/hirs/utils/crypto/AlgorithmsIds.java',
+    )
 }
 
 //task generateXjcLibrary(type:Exec) {
