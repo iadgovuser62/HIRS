@@ -69,7 +69,7 @@ spotless {
 
 tasks.named('checkstyleMain') {
     source = files(
-            'src/main/java/hirs/utils/crypto/AlgorithmsIds.java',
+            'src/main/java/hirs/utils/crypto/DefaultCrypto.java',
     )
 }
 

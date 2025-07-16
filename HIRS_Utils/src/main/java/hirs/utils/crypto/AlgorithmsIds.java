@@ -24,7 +24,6 @@ import java.util.NoSuchElementException;
 public final class AlgorithmsIds {
 
     private AlgorithmsIds() {
-        throw new UnsupportedOperationException("Utility class");
     }
 
     /** Hash Algorithm type. */
