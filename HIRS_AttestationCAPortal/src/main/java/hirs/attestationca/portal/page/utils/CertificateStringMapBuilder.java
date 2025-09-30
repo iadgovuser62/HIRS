@@ -17,6 +17,7 @@ import hirs.attestationca.persist.entity.userdefined.certificate.attributes.V2.P
 import hirs.attestationca.persist.util.AcaPciIds;
 import hirs.utils.BouncyCastleUtils;
 import hirs.utils.PciIds;
+import jakarta.persistence.Transient;
 import lombok.extern.log4j.Log4j2;
 import org.bouncycastle.util.encoders.Hex;
 
@@ -33,6 +34,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -41,10 +44,28 @@ import java.util.UUID;
  */
 @Log4j2
 public final class CertificateStringMapBuilder {
+
+    // Extended Key Usage (TCG KP) OIDs
+    private static final String TCG_KP_EK_CERTIFICATE = "2.23.133.8.1";
+    private static final String TCG_KP_PLATFORM_ATTRIBUTE_CERTIFICATE = "2.23.133.8.2";
+    private static final String TCG_KP_AIK_CERTIFICATE = "2.23.133.8.3";
+    private static final String TCG_KP_PLATFORM_KEY_CERTIFICATE = "2.23.133.8.4";
+    private static final String TCG_KP_DELTA_PLATFORM_ATTRIBUTE_CERTIFICATE = "2.23.133.8.5";
+
     /**
      * This private constructor was created to silence checkstyle error.
      */
     private CertificateStringMapBuilder() {
+    }
+
+    private static Map<String, String> getExtendedKeyUsageMap() {
+        Map<String, String> ekuMap = new HashMap<>();
+        ekuMap.put(TCG_KP_EK_CERTIFICATE, "tcg-kp-EKCertificate");
+        ekuMap.put(TCG_KP_PLATFORM_ATTRIBUTE_CERTIFICATE, "tcg-kp-PlatformAttributeCertificate");
+        ekuMap.put(TCG_KP_AIK_CERTIFICATE, "tcg-kp-AIKCertificate");
+        ekuMap.put(TCG_KP_PLATFORM_KEY_CERTIFICATE, "tcg-kp-PlatformKeyCertificate");
+        ekuMap.put(TCG_KP_DELTA_PLATFORM_ATTRIBUTE_CERTIFICATE, "tcg-kp-DeltaPlatformAttributeCertificate");
+        return ekuMap;
     }
 
     /**
@@ -59,6 +80,7 @@ public final class CertificateStringMapBuilder {
             final Certificate certificate, final CertificateRepository certificateRepository,
             final CACredentialRepository caCertificateRepository) {
         HashMap<String, String> data = new HashMap<>();
+        Map<String, String> ekuMap = getExtendedKeyUsageMap();
 
         if (certificate != null) {
             data.put("issuer", certificate.getIssuer());
@@ -134,7 +156,13 @@ public final class CertificateStringMapBuilder {
 
             if (certificate.getExtendedKeyUsage() != null
                     && !certificate.getExtendedKeyUsage().isEmpty()) {
-                data.put("extendedKeyUsage", certificate.getExtendedKeyUsage());
+                String eku = certificate.getExtendedKeyUsage().replaceAll("\\n$", "");
+                if (ekuMap.containsKey(eku)) {
+                    data.put("extendedKeyUsage", eku + " (" + ekuMap.get(eku) + ")");
+                }
+                else {
+                    data.put("extendedKeyUsage", eku + " (Warning: Unexpected OID)");
+                }
             }
 
             //Get issuer ID if not self signed
@@ -639,6 +667,7 @@ public final class CertificateStringMapBuilder {
                                                                        caCredentialRepository) {
 
         HashMap<String, String> data = new HashMap<>();
+        Map<String, String> ekuMap = getExtendedKeyUsageMap();
         IDevIDCertificate certificate = (IDevIDCertificate) certificateRepository.getCertificate(uuid);
 
         if (certificate != null) {
@@ -698,7 +727,13 @@ public final class CertificateStringMapBuilder {
 
             if (certificate.getExtendedKeyUsage() != null
                     && !certificate.getExtendedKeyUsage().isEmpty()) {
-                data.put("extendedKeyUsage", certificate.getExtendedKeyUsage());
+                String eku = certificate.getExtendedKeyUsage().replaceAll("\\n$", "");
+                if (ekuMap.containsKey(eku)) {
+                    data.put("extendedKeyUsage", eku + " (" + ekuMap.get(eku) + ")");
+                }
+                else {
+                    data.put("extendedKeyUsage", eku + " (Warning: Unexpected OID)");
+                }
             }
 
             if (certificate.getTpmPolicies() != null) {

@@ -2,6 +2,7 @@ package hirs.attestationca.persist.entity.userdefined.certificate.attributes;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import jakarta.persistence.Embedded;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -45,6 +46,15 @@ public class TPMSecurityAssertions implements Serializable {
     @Column
     private EkGenerationLocation ekCertificateGenerationLocation; //optional
 
+    @Embedded
+    private CommonCriteriaMeasures commonCriteriaMeasures; //optional
+
+    @Embedded
+    private FIPSLevel fipsLevel; //optional
+
+    //    private boolean iso9000Certified; //default false
+//    private IA5String iso9000Uri; //optional
+
     /**
      * Standard constructor that sets required fields. Use accessor methods
      * to set optional fields.
@@ -57,12 +67,6 @@ public class TPMSecurityAssertions implements Serializable {
         this.tpmSecAssertsVersion = version;
         this.fieldUpgradeable = fieldUpgradeable;
     }
-
-    // Future work (may need to create other classes):
-    //private CommonCriteriaMeasures commCritMeasures; //optional
-    //private FIPSLevel fipsLevel; //optional
-    //private boolean iso9000Certified; //default false
-    //private IA5String iso9000Uri; //optional
 
     /**
      * A type to handle the different endorsement key generation types used in the TPM

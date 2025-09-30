@@ -406,19 +406,37 @@
                         <div id="tpmSecurityAssertion" class="col col-md-8">
                             <div id="tpmSecurityAssertionInner" class="panel-body collapse" role="tabpanel"
                                 aria-expanded="false">
-                                <div>Version:&nbsp;<span>${initialData.TPMSecurityAssertionsTpmSecAssertsVersion}</span></div>
-                                <div>Field
-                                    Upgradeable:&nbsp;<span>${initialData.TPMSecurityAssertionsFieldUpgradeable}</span>
-                                </div>
-                                <div>ek Generation Type:&nbsp;<span>${initialData.TPMSecurityAssertionsEkGenType}</span>
-                                </div>
-                                <div>ek Generation
-                                    Location:&nbsp;<span>${initialData.TPMSecurityAssertionsEkGenerationLocation}</span></div>
-                                <div>ek Certificate Generation
-                                    Location:&nbsp;<span>${initialData.TPMSecurityAssertionsEkCertificateGenerationLocation}</span></div>
+                                <table class="table table-bordered table-sm">
+                                    <tr><th>Version</th><td>${initialData.TPMSecurityAssertionsTpmSecAssertsVersion}</td></tr>
+                                    <tr><th>Field Upgradeable</th><td>${initialData.TPMSecurityAssertionsFieldUpgradeable}</td></tr>
+                                    <tr><th>EK Generation Type</th><td>${initialData.TPMSecurityAssertionsEkGenType}</td></tr>
+                                    <tr><th>EK Generation Location</th><td>${initialData.TPMSecurityAssertionsEkGenerationLocation}</td></tr>
+                                    <tr><th>EK Certificate Generation Location</th><td>${initialData.TPMSecurityAssertionsEkCertificateGenerationLocation}</td></tr>
+                                </table>
+                                <h5>Common Criteria Info</h5>
+                                <table class="table table-bordered table-sm">
+                                    <tr><th>Version</th><td>${initialData.TPMSecurityAssertionsCcInfoVersion}</td></tr>
+                                    <tr><th>Assurance Level</th><td>${initialData.TPMSecurityAssertionsCcInfoAssuranceLevel}</td></tr>
+                                    <tr><th>Evaluation Status</th><td>${initialData.TPMSecurityAssertionsCcInfoEvaluationStatus}</td></tr>
+                                    <tr><th>Plus</th><td>${initialData.TPMSecurityAssertionsCcInfoPlus}</td></tr>
+                                    <tr><th>Strength of Function</th><td>${initialData.TPMSecurityAssertionsCcInfoStrengthOfFunction}</td></tr>
+                                    <tr><th>Profile OID</th><td>${initialData.TPMSecurityAssertionsCcInfoProfileOid}</td></tr>
+                                    <tr><th>Profile URI</th><td>${initialData.TPMSecurityAssertionsCcInfoProfileUri}</td></tr>
+                                    <tr><th>Target OID</th><td>${initialData.TPMSecurityAssertionsCcInfoTargetOid}</td></tr>
+                                    <tr><th>Target URI</th><td>${initialData.TPMSecurityAssertionsCcInfoTargetUri}</td></tr>
+                                </table>
+                                <h5>FIPS Info</h5>
+                                <table class="table table-bordered table-sm">
+                                    <tr><th>Version</th><td>${initialData.TPMSecurityAssertionsFipsVersion}</td></tr>
+                                    <tr><th>Level</th><td>${initialData.TPMSecurityAssertionsFipsLevel}</td></tr>
+                                    <tr><th>Plus</th><td>${initialData.TPMSecurityAssertionsFipsPlus}</td></tr>
+                                </table>
+                                <table class="table table-bordered table-sm">
+                                    <tr><th>ISO 9000 Certified</th><td>${initialData.TPMSecurityAssertionsIso9000Certified}</td></tr>
+                                    <tr><th>ISO 9000 URI</th><td>${initialData.TPMSecurityAssertionsIso9000Uri}</td></tr>
+                                </table>
                             </div>
                         </div>
-                    </div>
                 </c:when>
                 <c:when test="${param.type=='platform'}">
                     <c:if test="${not empty initialData.platformType}">
@@ -1047,17 +1065,37 @@
                 <div id="tpmSecurityAssertion" class="col col-md-8">
                     <div id="tpmSecurityAssertionInner" class="panel-body collapse" role="tabpanel"
                         aria-expanded="false">
-                        <div>Version:&nbsp;<span>${initialData.TPMSecurityAssertionsTpmSecAssertsVersion}</span></div>
-                        <div>Field Upgradeable:&nbsp;<span>${initialData.TPMSecurityAssertionsFieldUpgradeable}</span>
+                            <table class="table table-bordered table-sm">
+                                <tr><th>Version</th><td>${initialData.TPMSecurityAssertionsTpmSecAssertsVersion}</td></tr>
+                                <tr><th>Field Upgradeable</th><td>${initialData.TPMSecurityAssertionsFieldUpgradeable}</td></tr>
+                                <tr><th>EK Generation Type</th><td>${initialData.TPMSecurityAssertionsEkGenType}</td></tr>
+                                <tr><th>EK Generation Location</th><td>${initialData.TPMSecurityAssertionsEkGenerationLocation}</td></tr>
+                                <tr><th>EK Certificate Generation Location</th><td>${initialData.TPMSecurityAssertionsEkCertificateGenerationLocation}</td></tr>
+                            </table>
+                            <h5>Common Criteria Info</h5>
+                            <table class="table table-bordered table-sm">
+                                <tr><th>Version</th><td>${initialData.TPMSecurityAssertionsCcInfoVersion}</td></tr>
+                                <tr><th>Assurance Level</th><td>${initialData.TPMSecurityAssertionsCcInfoAssuranceLevel}</td></tr>
+                                <tr><th>Evaluation Status</th><td>${initialData.TPMSecurityAssertionsCcInfoEvaluationStatus}</td></tr>
+                                <tr><th>Plus</th><td>${initialData.TPMSecurityAssertionsCcInfoPlus}</td></tr>
+                                <tr><th>Strength of Function</th><td>${initialData.TPMSecurityAssertionsCcInfoStrengthOfFunction}</td></tr>
+                                <tr><th>Profile OID</th><td>${initialData.TPMSecurityAssertionsCcInfoProfileOid}</td></tr>
+                                <tr><th>Profile URI</th><td>${initialData.TPMSecurityAssertionsCcInfoProfileUri}</td></tr>
+                                <tr><th>Target OID</th><td>${initialData.TPMSecurityAssertionsCcInfoTargetOid}</td></tr>
+                                <tr><th>Target URI</th><td>${initialData.TPMSecurityAssertionsCcInfoTargetUri}</td></tr>
+                            </table>
+                            <h5>FIPS Info</h5>
+                            <table class="table table-bordered table-sm">
+                                <tr><th>Version</th><td>${initialData.TPMSecurityAssertionsFipsVersion}</td></tr>
+                                <tr><th>Level</th><td>${initialData.TPMSecurityAssertionsFipsLevel}</td></tr>
+                                <tr><th>Plus</th><td>${initialData.TPMSecurityAssertionsFipsPlus}</td></tr>
+                            </table>
+                            <table class="table table-bordered table-sm">
+                                <tr><th>ISO 9000 Certified</th><td>${initialData.TPMSecurityAssertionsIso9000Certified}</td></tr>
+                                <tr><th>ISO 9000 URI</th><td>${initialData.TPMSecurityAssertionsIso9000Uri}</td></tr>
+                            </table>
                         </div>
-                        <div>ek Generation Type:&nbsp;<span>${initialData.TPMSecurityAssertionsEkGenType}</span></div>
-                        <div>ek Generation Location:&nbsp;<span>${initialData.TPMSecurityAssertionsEkGenerationLocation}</span>
-                        </div>
-                        <div>ek Certificate Generation
-                            Location:&nbsp;<span>${initialData.TPMSecurityAssertionsEkCertificateGenerationLocation}</span></div>
                     </div>
-                </div>
-            </div>
         </c:when>
         <c:when test="${param.type=='idevid'}">
             <c:choose>
